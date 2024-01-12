@@ -1,4 +1,4 @@
-from getch import getch, pause
+from getch import getch
 import subprocess
 import sys
 import os
@@ -16,6 +16,7 @@ class bcolors:
     ORANGE = '\33[33m'
     VIOLET = '\33[35m'
 
+# Clear terminal
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
 cls()
@@ -33,6 +34,7 @@ sys.path.append(os.path.realpath("."))
 def exit():
     sys.exit("Exiting...")
 
+# Menu
 choice = ""
 while choice != "3":
     print(bcolors.YELLOW+"\n Options:")
@@ -40,16 +42,24 @@ while choice != "3":
     print(bcolors.BLUE+"2. Decrypter")
     print(bcolors.RED+"3. Quit")
 
+    # Capture user num. input
     choice = getch()
 
-
     if choice == "1":
-        foldername = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " target name: ")
-        cmd = f'tar -czvf - {foldername} | pv -W | openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {foldername}.tar.enc && rm -r {foldername}'
+
+        # Define the target to encryot [ file or folder ]
+        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " target name: ")
+
+        # Set the AES-256 & remove original target
+        cmd = f'tar -czvf - {target} | pv -W | openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.tar.enc && rm -r {target}'
         print(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.RED + ' Executing command...')
+
+        # Execute
         subprocess.run(cmd, shell=True)
-        separacion = int(input(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " separation *bits value: "))
-        
+
+        # Define the n of random bytes between original-encrypted ones
+        separacion = int(input(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " fill *byte value: "))
+
         if int(separacion) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
@@ -58,8 +68,7 @@ while choice != "3":
             with open(file, 'rb') as content:
                 data = bytearray(content.read())
 
-
-
+            # Target content in binary
             datos_encriptados = bytearray()
 
             for _ in range(separacion):
@@ -67,16 +76,20 @@ while choice != "3":
 
             for i in range(0, len(data), 1):
                 bloque = data[i:i + 1]
+                # Reverse the block
                 bloque_invertido = bytearray([~b & 0xff for b in bloque])
                 datos_encriptados.extend(bloque_invertido)
 
+                # If not the last byte, adds additional random blocks
                 if i + 1 < len(data):
                     for _ in range(separacion):
                         datos_encriptados.extend(generar_bloque_aleatorio())
-
+    
+            # Add random blocks to the end of the encrypted file
             for _ in range(separacion):
                 datos_encriptados.extend(generar_bloque_aleatorio())
 
+            # write changes
             with open(file, 'wb') as encrypted_file:
                 encrypted_file.write(datos_encriptados)
 
@@ -85,13 +98,15 @@ while choice != "3":
         def generar_bloque_aleatorio():
             return bytearray([random.randint(0, 255)])
 
-        encriptar(f"{foldername}.tar.enc", separacion)
-
+        encriptar(f"{target}.tar.enc", separacion)
 
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
                 
     if choice == "2":
-        separacion = int(input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " separation *bits value: "))
+
+        # Reverse the steps
+        separacion = int(input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " fill *byte value: "))
+
         if int(separacion) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
@@ -100,10 +115,12 @@ while choice != "3":
             with open(file, 'rb') as content:
                 data = bytearray(content.read())
 
+            # Target content in binary
             datos_desencriptados = bytearray()
-
+            # Reverse the block
             datos_encriptados_invertidos = bytearray([~b & 0xff for b in data])
-
+          
+            # Iterate over the reversed data to reconstruct the encripted-AES-256 content
             for i in range(separacion, len(datos_encriptados_invertidos) - separacion, 1):
                 if i % (separacion + 1) == separacion:
                     bloque = datos_encriptados_invertidos[i:i + 1]
@@ -117,9 +134,14 @@ while choice != "3":
 
             print(f"    --> Decrypted file saved as '{file}'.")
 
-        foldername = input(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " target name (exclude .tar.enc): ")
-        desencriptar(f"{foldername}.tar.enc", separacion)
-        cmd = f'pv -W {foldername}.tar.enc | openssl enc -aes-256-cbc -d -md sha512 -pbkdf2 -iter 1000000 -salt -in - | tar xzvf - && rm {foldername}.tar.enc'  
+        target = input(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " target name (exclude .tar.enc): ")
+
+        # Start removing filler bytes and invert the blocks
+        desencriptar(f"{target}.tar.enc", separacion)
+
+        # Finally, decrypt the AES-256 encrypted target
+        cmd = f'pv -W {target}.tar.enc | openssl enc -aes-256-cbc -d -md sha512 -pbkdf2 -iter 1000000 -salt -in - | tar xzvf - && rm {target}.tar.enc'
+        
         print(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.RED + 'Executing command...')
         subprocess.run(cmd, shell=True)
 
