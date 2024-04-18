@@ -1,4 +1,6 @@
 from getch import getch
+from getpass import getpass
+import hashlib
 import subprocess
 import sys
 import os
@@ -32,7 +34,7 @@ print(bcolors.GREEN+" ╚══════╝ ╚═════╝╚═╝  �
 sys.path.append(os.path.realpath("."))
 
 def exit():
-    sys.exit("Exiting...")
+    sys.exit("\nExiting...")
 
 # Menu
 choice = ""
@@ -48,105 +50,194 @@ while choice != "3":
     if choice == "1":
 
         # Define the target to encryot [ file or folder ]
-        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " target name: ")
-
+        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
+        password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         # Set the AES-256 & remove original target
-        cmd = f'tar -czvf - {target} | pv -W | openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.tar.enc && rm -r {target}'
-        print(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.RED + ' Executing command...')
-
-        # Execute
-        subprocess.run(cmd, shell=True)
+        cmd = f'tar -czvf - {target} | openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.tar.enc -k "{password}" && rm -r {target}'
+        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing AES-256')
+        try:
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError as e:
+            print(bcolors.RED + "Error:", e.stderr.decode())
+            exit()
 
         # Define the n of random bytes between original-encrypted ones
-        separacion = int(input(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " fill *byte value: "))
-
+        separacion = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
         if int(separacion) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
 
         def encriptar(file, separacion):
-            with open(file, 'rb') as content:
-                data = bytearray(content.read())
+            with open("tempfile", "w") as f: # grep the binary file content
+                subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7 | tr -d ' ' | tr -d '\n'"], shell=True, stdout=f)
 
-            # Target content in binary
-            datos_encriptados = bytearray()
+            def insertar_aleatorios(separacion):
+                print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Injecting random bits")
+                with open("tempfile", "r") as f:
+                    binary_data = f.read()
+                encrypted_data = []
+                encrypted_data.extend(random.choices('01', k=separacion))
 
-            for _ in range(separacion):
-                datos_encriptados.extend(generar_bloque_aleatorio())
+                for bit in binary_data:
+                    encrypted_data.append('1' if bit == '0' else '0') # add reversed bit
+                    encrypted_data.extend(random.choices('01', k=separacion)) # generate random bit/s
 
-            for i in range(0, len(data), 1):
-                bloque = data[i:i + 1]
-                # Reverse the block
-                bloque_invertido = bytearray([~b & 0xff for b in bloque])
-                datos_encriptados.extend(bloque_invertido)
+                return ''.join(encrypted_data) # join all bits
+            
+            subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
+            with open(file, "wb") as f:
+                encrypted_data = insertar_aleatorios(separacion) # Call the function to invert and fill
+                byte_data = bits_to_bytes(encrypted_data) # Call the function to convert bits to bytes
+                f.write(byte_data)
+                
+        # function to convert bits to bytes
+        def bits_to_bytes(bit_string):
+            return bytes(int(bit_string[i:i+8], 2) for i in range(0, len(bit_string), 8))
 
-                # If not the last byte, adds additional random blocks
-                if i + 1 < len(data):
-                    for _ in range(separacion):
-                        datos_encriptados.extend(generar_bloque_aleatorio())
-    
-            # Add random blocks to the end of the encrypted file
-            for _ in range(separacion):
-                datos_encriptados.extend(generar_bloque_aleatorio())
+        encriptar(f"{target}.tar.enc", separacion) # AES-256 | invert | fill | bits->bytes
 
-            # write changes
-            with open(file, 'wb') as encrypted_file:
-                encrypted_file.write(datos_encriptados)
+        def generar_secuencia_aleatoria_con_contraseña(contraseña, tamaño): # make unique byte to decimal table using password
+            indices_unicos = []
+            i = 0
+            while len(indices_unicos) < tamaño:
 
-            print(f"    --> Encrypted file with padding {separacion} & saved as '{file}'.")
+                cadena_a_hashear = str(i) + contraseña
+                hash_obj = hashlib.sha256(cadena_a_hashear.encode())
+                indice_modificado = int.from_bytes(hash_obj.digest(), byteorder='big') % 256
+                
+                if indice_modificado not in indices_unicos:
+                    indices_unicos.append(indice_modificado)          
+                i += 1 
+            return indices_unicos
 
-        def generar_bloque_aleatorio():
-            return bytearray([random.randint(0, 255)])
+        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password, 256)
 
-        encriptar(f"{target}.tar.enc", separacion)
+        with open("llave.txt", "w", encoding='utf-8') as f:
+            for i, indice_modificado in enumerate(secuencia_aleatoria):
+                binary_sequence = format(indice_modificado, '08b')
+                f.write(f"{indice_modificado} {binary_sequence}\n") # write final table
+
+        with open("tempfile", "w") as f:
+            subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7"], shell=True, stdout=f)
+        
+        with open("tempfile", "r") as f:
+            binary_data = ''.join(char for char in f.read() if char in ['0', '1'])
+
+        key = {}
+        with open("llave.txt", "r") as key_file:
+            for line in key_file:
+                value, binary = line.strip().split()
+                key[binary] = int(value)
+
+        subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
+        with open(f"{target}.tar.enc", "a") as encoded_file:
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting 8bit to referenced decimal number") 
+            block_size = 8 # 8 bit chain = byte
+            for i in range(0, len(binary_data), block_size):
+                block = binary_data[i:i+block_size]
+                decimal_value = key.get(block)  
+                decimal_output = str(decimal_value) + "\n"
+                
+                encoded_file.write(decimal_output) 
+
+        subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
 
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
+        exit()
                 
-    if choice == "2":
+    if choice == "2": # Repeats 1 but process is reversed
 
-        # Reverse the steps
-        separacion = int(input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " fill *byte value: "))
+        def bits_to_bytes(bit_string):
+            return bytes(int(bit_string[i:i+8], 2) for i in range(0, len(bit_string), 8))
+
+        def desencriptar(file, separacion):
+            with open("tempfile", 'w') as f:
+                subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7 | tr -d ' ' | tr -d '\n'"], shell=True, stdout=f)
+            
+            with open("tempfile", "r") as f:
+                binary_data = f.read()
+                inverted_data = ''.join('1' if bit == '0' else '0' for bit in binary_data)
+
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")    
+            original_data = "".join(inverted_data[separacion::(separacion+1)])
+            numeroactual = 0
+            while numeroactual <= len(original_data): 
+                numeroactual += 8
+            if numeroactual == len(original_data):
+                decrypted_bytes = bits_to_bytes(original_data)
+            else:
+                numeroactual -= 8
+                decrypted_bytes = bits_to_bytes(original_data[:-(len(original_data)-numeroactual)]) # Remove bits outside final byte block
+
+            subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
+            with open(file, "wb") as f:
+                f.write(decrypted_bytes)
+    
+        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name (exclude .tar.enc): ")
+        password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
+        separacion = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
 
         if int(separacion) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
 
-        def desencriptar(file, separacion):
-            with open(file, 'rb') as content:
-                data = bytearray(content.read())
+        def generar_secuencia_aleatoria_con_contraseña(contraseña, tamaño):
+            indices_unicos = []
+            i = 0
+            while len(indices_unicos) < tamaño:
+                cadena_a_hashear = str(i) + contraseña
+                hash_obj = hashlib.sha256(cadena_a_hashear.encode())
+                indice_modificado = int.from_bytes(hash_obj.digest(), byteorder='big') % 256
+                
+                if indice_modificado not in indices_unicos:
+                    indices_unicos.append(indice_modificado)
+                i += 1
+            return indices_unicos
 
-            # Target content in binary
-            datos_desencriptados = bytearray()
-            # Reverse the block
-            datos_encriptados_invertidos = bytearray([~b & 0xff for b in data])
-          
-            # Iterate over the reversed data to reconstruct the encripted-AES-256 content
-            for i in range(separacion, len(datos_encriptados_invertidos) - separacion, 1):
-                if i % (separacion + 1) == separacion:
-                    bloque = datos_encriptados_invertidos[i:i + 1]
-                    bloque_invertido = bytearray([~b & 0xff for b in bloque])
-                    datos_desencriptados.extend(bloque_invertido)
+        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password, 256)
 
-            datos_desencriptados_invertidos = bytearray([~b & 0xff for b in datos_desencriptados])
+        with open("llave.txt", "w", encoding='utf-8') as f:
+            for i, indice_modificado in enumerate(secuencia_aleatoria):
+                binary_sequence = format(indice_modificado, '08b')
+                f.write(f"{indice_modificado} {binary_sequence}\n")
 
-            with open(file, 'wb') as decrypted_file:
-                decrypted_file.write(datos_desencriptados_invertidos)
+        with open(f"{target}.tar.enc", "r") as encoded_file:
+            decimal_values = encoded_file.read().split("\n")
 
-            print(f"    --> Decrypted file saved as '{file}'.")
+        key = {}
+        with open("llave.txt", "r") as key_file:
+            for line in key_file:
+                value, binary = line.strip().split()
+                key[binary] = int(value)
 
-        target = input(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " target name (exclude .tar.enc): ")
+        inverse_key = {value: binary for binary, value in key.items()}
+        decimal_values = [value for value in decimal_values if value.strip()]
 
-        # Start removing filler bytes and invert the blocks
+        subprocess.run(["rm", f"{target}.tar.enc"])
+
+        with open(f"{target}.tar.enc", "ab") as reconstructed_file:
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting decimal number to 8bit referenced")
+            for decimal_value in decimal_values:
+                binary_block = inverse_key.get(int(decimal_value), "Unknown")  
+                if binary_block != "Unknown":
+                    decimal_value = int(binary_block, 2) 
+                    reconstructed_file.write(bytes([decimal_value]))
+
+   
         desencriptar(f"{target}.tar.enc", separacion)
-
-        # Finally, decrypt the AES-256 encrypted target
-        cmd = f'pv -W {target}.tar.enc | openssl enc -aes-256-cbc -d -md sha512 -pbkdf2 -iter 1000000 -salt -in - | tar xzvf - && rm {target}.tar.enc'
+        subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
         
-        print(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.RED + 'Executing command...')
-        subprocess.run(cmd, shell=True)
+        cmd = f'pv -W {target}.tar.enc | openssl enc -aes-256-cbc -d -md sha512 -pbkdf2 -iter 1000000 -salt -in - -k "{password}" | tar xzvf - && rm {target}.tar.enc'
+        
+        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing AES-256')
+        try:
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError as e:
+            print(bcolors.RED + "Error:", e.stderr.decode())
+            exit()
+        
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{target}'.")
 
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
-        exit()
-    
-    else:
         exit()
