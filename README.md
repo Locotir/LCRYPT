@@ -1,5 +1,5 @@
 # LCRYPT
-Interesting form of obfuscation in AES-256 post encrypted files
+Impenetrable encryption combinations
 
 ### Requirements
 Openssl & getch==1.0
@@ -18,30 +18,36 @@ openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.ta
 ```
 ### Reverse binary chain
 
-### Fill whith n bytes between
+### Fill whith bits between each original bit
 
 ### Graphical explanation
 
-![2024-01-12-00:53:50-screenshot](https://github.com/Locotir/LCRYPT/assets/71979632/f0cb2ad5-5a7e-42ed-a32e-090217fb0719)
+![2024-04-18-204400_1181x931_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/5cafdac8-17a3-401b-ac9b-4586aca26bae)
+
 
 ### Target
 
-![2024-01-12-20:45:28-screenshot](https://github.com/Locotir/LCRYPT/assets/71979632/1de733f2-8155-4b87-9733-befaa434027f)
+![2024-04-18-205055_716x101_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/cc5829c0-59aa-47c0-a001-bb407ce8ce55)
+
 
 ### After AES-256
 
-![2024-01-12-20:47:04-screenshot](https://github.com/Locotir/LCRYPT/assets/71979632/cd271aa0-5fee-44f4-9a71-ee2c2729c11d)
+![2024-04-18-205308_746x689_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/85567a75-fec9-4005-b536-7ebd47831ac3)
 
-### After *Byte random bytes refilled [ 2 in this example ]
 
-![2024-01-12-20:51:35-screenshot](https://github.com/Locotir/LCRYPT/assets/71979632/df2a8806-aaa1-4a79-aed8-5b06587c5be2)
+### After +Bit/s random bits refilled [ 2 in this example ] & Randomiced decimal ((0-255) for earch 8Bit) chain numer referenced
+
+![2024-04-18-205410_723x451_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/8e6dd536-fe90-44ea-b4ef-7bf47e9d4faa)
+
 
 ### Console preview
 
-![2024-01-12-20:51:45-screenshot](https://github.com/Locotir/LCRYPT/assets/71979632/0e7e3297-6d6a-4aeb-8c51-bb7ba5bdbba7)
+![2024-04-18-205502_655x542_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/c6c48f21-7ad6-4183-b8a6-2533f347d6bd)
+
 
 ### All the process on hex content view
 
-![2024-01-12-20:55:32-screenshot](https://github.com/Locotir/LCRYPT/assets/71979632/ce1396a0-5a0f-4b69-aa78-3a91aa9ec03d)
+
+![2024-04-18-205816_711x650_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/2052e6e8-432a-44d3-a275-712a4b2b0d23)
 
 
