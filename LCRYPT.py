@@ -144,9 +144,9 @@ while choice != "3":
                 encoded_file.write(decimal_output)
 
         subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"@" + bcolors.WHITE+"]" +bcolors.WHITE+ " Compressing...")
+        print(bcolors.WHITE+"[" + bcolors.RED+"@" + bcolors.WHITE+"]" +bcolors.WHITE+ " Compressing...")
         subprocess.run([f"xz -9 {target}.tar.enc"], shell=True)
-        print(bcolors.WHITE+"[" + bcolors.RED+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
 
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
         exit()
