@@ -92,30 +92,32 @@ while choice != "3":
                 
         # function to convert bits to bytes
         def bits_to_bytes(bit_string):
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bits to bytes") 
             return bytes(int(bit_string[i:i+8], 2) for i in range(0, len(bit_string), 8))
 
         encriptar(f"{target}.tar.enc", separacion) # AES-256 | invert | fill | bits->bytes
 
-        def generar_secuencia_aleatoria_con_contraseña(contraseña, tamaño): # make unique byte to decimal table using password
-            indices_unicos = []
-            i = 0
-            while len(indices_unicos) < tamaño:
+        def generar_secuencia_aleatoria_con_contraseña(contraseña):
+            # Generar la primera columna permutada según la contraseña
+            primera_columna = list(range(256))
+            hash_contraseña = hashlib.sha256(contraseña.encode()).digest()
+            random_seed = int.from_bytes(hash_contraseña, 'big')
+            random.seed(random_seed)
+            random.shuffle(primera_columna)
 
-                cadena_a_hashear = str(i) + contraseña
-                hash_obj = hashlib.sha256(cadena_a_hashear.encode())
-                indice_modificado = int.from_bytes(hash_obj.digest(), byteorder='big') % 256
-                
-                if indice_modificado not in indices_unicos:
-                    indices_unicos.append(indice_modificado)          
-                i += 1 
-            return indices_unicos
+            # Generar la segunda columna fija
+            segunda_columna = [format(i, '08b') for i in range(256)]
 
-        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password, 256)
+            # Combinar las dos columnas en una lista de cadenas
+            secuencia_aleatoria = [f"{primera_columna[i]} {segunda_columna[i]}" for i in range(256)]
+
+            return secuencia_aleatoria
+
+        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password)
 
         with open("llave.txt", "w", encoding='utf-8') as f:
-            for i, indice_modificado in enumerate(secuencia_aleatoria):
-                binary_sequence = format(indice_modificado, '08b')
-                f.write(f"{indice_modificado} {binary_sequence}\n") # write final table
+            for fila in secuencia_aleatoria:
+                f.write(f"{fila}\n")
 
         with open("tempfile", "w") as f:
             subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7"], shell=True, stdout=f)
@@ -129,16 +131,17 @@ while choice != "3":
                 value, binary = line.strip().split()
                 key[binary] = int(value)
 
+
         subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
         with open(f"{target}.tar.enc", "a") as encoded_file:
-            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting 8bit to referenced decimal number") 
-            block_size = 8 # 8 bit chain = byte
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bytes to referenced decimal number") 
+            block_size = 8
             for i in range(0, len(binary_data), block_size):
                 block = binary_data[i:i+block_size]
                 decimal_value = key.get(block)  
                 decimal_output = str(decimal_value) + "\n"
                 
-                encoded_file.write(decimal_output) 
+                encoded_file.write(decimal_output)
 
         subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
         print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
@@ -162,18 +165,22 @@ while choice != "3":
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")    
             original_data = "".join(inverted_data[separacion::(separacion+1)])
             numeroactual = 0
-            while numeroactual <= len(original_data): 
+            while numeroactual <= len(original_data):
                 numeroactual += 8
+            
             if numeroactual == len(original_data):
                 decrypted_bytes = bits_to_bytes(original_data)
             else:
                 numeroactual -= 8
-                decrypted_bytes = bits_to_bytes(original_data[:-(len(original_data)-numeroactual)]) # Remove bits outside final byte block
+                decrypted_bytes = bits_to_bytes(original_data[:-(len(original_data)-numeroactual)])
+
 
             subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
             with open(file, "wb") as f:
                 f.write(decrypted_bytes)
     
+            
+
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name (exclude .tar.enc): ")
         password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         separacion = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
@@ -182,25 +189,27 @@ while choice != "3":
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
 
-        def generar_secuencia_aleatoria_con_contraseña(contraseña, tamaño):
-            indices_unicos = []
-            i = 0
-            while len(indices_unicos) < tamaño:
-                cadena_a_hashear = str(i) + contraseña
-                hash_obj = hashlib.sha256(cadena_a_hashear.encode())
-                indice_modificado = int.from_bytes(hash_obj.digest(), byteorder='big') % 256
-                
-                if indice_modificado not in indices_unicos:
-                    indices_unicos.append(indice_modificado)
-                i += 1
-            return indices_unicos
+        def generar_secuencia_aleatoria_con_contraseña(contraseña):
+            # Generar la primera columna permutada según la contraseña
+            primera_columna = list(range(256))
+            hash_contraseña = hashlib.sha256(contraseña.encode()).digest()
+            random_seed = int.from_bytes(hash_contraseña, 'big')
+            random.seed(random_seed)
+            random.shuffle(primera_columna)
 
-        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password, 256)
+            # Generar la segunda columna fija
+            segunda_columna = [format(i, '08b') for i in range(256)]
+
+            # Combinar las dos columnas en una lista de cadenas
+            secuencia_aleatoria = [f"{primera_columna[i]} {segunda_columna[i]}" for i in range(256)]
+
+            return secuencia_aleatoria
+
+        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password)
 
         with open("llave.txt", "w", encoding='utf-8') as f:
-            for i, indice_modificado in enumerate(secuencia_aleatoria):
-                binary_sequence = format(indice_modificado, '08b')
-                f.write(f"{indice_modificado} {binary_sequence}\n")
+            for fila in secuencia_aleatoria:
+                f.write(f"{fila}\n")
 
         with open(f"{target}.tar.enc", "r") as encoded_file:
             decimal_values = encoded_file.read().split("\n")
@@ -217,7 +226,7 @@ while choice != "3":
         subprocess.run(["rm", f"{target}.tar.enc"])
 
         with open(f"{target}.tar.enc", "ab") as reconstructed_file:
-            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting decimal number to 8bit referenced")
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting decimal number to bytes referenced")
             for decimal_value in decimal_values:
                 binary_block = inverse_key.get(int(decimal_value), "Unknown")  
                 if binary_block != "Unknown":
