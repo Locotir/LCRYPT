@@ -144,7 +144,9 @@ while choice != "3":
                 encoded_file.write(decimal_output)
 
         subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"@" + bcolors.WHITE+"]" +bcolors.WHITE+ " Compressing...")
+        subprocess.run([f"xz -9 {target}.tar.enc"], shell=True)
+        print(bcolors.WHITE+"[" + bcolors.RED+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
 
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
         exit()
@@ -188,6 +190,9 @@ while choice != "3":
         if int(separacion) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
+
+        print(bcolors.WHITE+"[" + bcolors.RED+"@" + bcolors.WHITE+"]" +bcolors.WHITE+ " Desompressing...")
+        subprocess.run([f"xz -d {target}.tar.enc.xz"], shell=True)
 
         def generar_secuencia_aleatoria_con_contraseña(contraseña):
             # Generar la primera columna permutada según la contraseña
