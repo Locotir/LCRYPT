@@ -37,7 +37,7 @@ openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.ta
 ![2024-04-18-205308_746x689_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/85567a75-fec9-4005-b536-7ebd47831ac3)
 
 
-### After ++Bit/s random refilled & Randomiced decimal ((0-255) for earch 8Bit) chain numer referenced
+### After ++Bit/s randomized filled & Randomiced decimal (0-255) for earch Byte chain number referenced
 
 ![2024-04-18-205410_723x451_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/8e6dd536-fe90-44ea-b4ef-7bf47e9d4faa)
 
