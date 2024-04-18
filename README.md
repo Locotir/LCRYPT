@@ -12,13 +12,15 @@ This program is provided for educational and research purposes only. The user as
 
 # Program operation
 
-### Encrypt whith AES-256
+### |Encrypt whith AES-256
 ``` 
 openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.tar.enc
 ```
-### Reverse binary chain
+### |Reverse binary chain
 
-### Fill whith bits between each original bit
+### |Fill whith bits between each original bit
+
+### |Convert each 8bit string to decimal (0-255):Psswd randomized
 
 ### Graphical explanation
 
