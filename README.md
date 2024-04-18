@@ -22,7 +22,7 @@ openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.ta
 
 ### |Convert each 8bit string to decimal (0-255):Psswd randomized
 
-### Graphical explanation
+# Graphical explanation
 
 ![2024-04-18-204400_1181x931_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/5cafdac8-17a3-401b-ac9b-4586aca26bae)
 
