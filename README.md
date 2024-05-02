@@ -2,7 +2,7 @@
 Impenetrable encryption combinations
 
 ### Requirements
-Openssl & getch==1.0
+getch==1.0
 
 ### Targets accepted
 All type of files and folders
