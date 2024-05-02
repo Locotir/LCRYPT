@@ -12,10 +12,8 @@ This program is provided for educational and research purposes only. The user as
 
 # Program operation
 
-### |Encrypt whith AES-256
-``` 
-openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.tar.enc
-```
+### |Binary Shuffle
+
 ### |Reverse binary chain
 
 ### |Fill whith bits between each original bit
@@ -29,27 +27,21 @@ openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.ta
 
 ### Target
 
-![2024-04-18-205055_716x101_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/cc5829c0-59aa-47c0-a001-bb407ce8ce55)
-
-
-### After AES-256
-
-![2024-04-18-205308_746x689_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/85567a75-fec9-4005-b536-7ebd47831ac3)
-
+![2024-05-02-163611_727x95_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/9601ef10-7995-40af-995a-dc3433d91252)
 
 ### After ++Bit/s randomized filled & Randomiced decimal (0-255) for earch Byte chain number referenced
 
-![2024-04-18-205410_723x451_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/8e6dd536-fe90-44ea-b4ef-7bf47e9d4faa)
+![2024-05-02-163755_756x137_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/657bd28c-9b20-44f6-8a49-c2fdb699f308)
 
 
 ### Console preview
 
-![2024-04-18-205502_655x542_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/c6c48f21-7ad6-4183-b8a6-2533f347d6bd)
+![2024-05-02-163956_596x535_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/a3744023-f772-437d-b438-a4a1c6fb02c2)
 
 
 ### All the process on hex content view
 
+![2024-05-02-164206_688x103_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/8137064b-ed47-4649-bbb1-aca2795732b0)
 
-![2024-04-18-205816_711x650_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/2052e6e8-432a-44d3-a275-712a4b2b0d23)
 
 
