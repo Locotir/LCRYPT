@@ -1,5 +1,5 @@
 # LCRYPT
-Impenetrable encryption combinations
+Unbreakable encryption combinations
 
 ### Requirements
 getch==1.0
