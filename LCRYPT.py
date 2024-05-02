@@ -5,9 +5,10 @@ import subprocess
 import sys
 import os
 import random
+import time
 
 class bcolors:
-    PURPLE = '\033[95m'
+    PURPLE = '\033[95m' 
     BLUE = '\033[94m'
     BLUEL = '\033[96m'
     GREEN = '\033[92m'
@@ -36,6 +37,48 @@ sys.path.append(os.path.realpath("."))
 def exit():
     sys.exit("\nExiting...")
 
+
+def random_list(lenght, passwd):
+    hash_obj = hashlib.sha256(passwd.encode())
+    hash_int = int.from_bytes(hash_obj.digest(), byteorder='big')
+    
+    # Use passwd->number as seed to generate list
+    random.seed(hash_int)
+    random_list = list(range(1, lenght + 1))
+    random.shuffle(random_list)  # Shuffle list
+    return random_list
+
+def reorganize_string(string, random_list):
+    new_list = [None] * len(string)
+    for i, index in enumerate(random_list):
+        new_list[index - 1] = string[i]
+    return ''.join(new_list)
+
+def read_binary(file):
+    with open(file, 'rb') as f:
+        bytes = f.read()
+
+    binary_content = ''.join(format(byte, '08b') for byte in bytes)
+    return binary_content
+
+def random_secuence(passwd):
+    # generate first column with passwd dependency
+    first_column = list(range(256))
+    passwd_hash = hashlib.sha256(passwd.encode()).digest()
+    random_seed = int.from_bytes(passwd_hash, 'big')
+    random.seed(random_seed)
+    random.shuffle(first_column)
+
+    # generate second column fixed
+    second_column = [format(i, '08b') for i in range(256)]
+
+    # combine the 2 columns into list
+    random_secuence = [f"{first_column[i]} {second_column[i]}" for i in range(256)]
+
+    return random_secuence
+    
+
+
 # Menu
 choice = ""
 while choice != "3":
@@ -52,41 +95,38 @@ while choice != "3":
         # Define the target to encryot [ file or folder ]
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
         password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
-        # Set the AES-256 & remove original target
-        cmd = f'tar -czvf - {target} | openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.tar.enc -k "{password}" && rm -r {target}'
-        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing AES-256')
-        try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as e:
-            print(bcolors.RED + "Error:", e.stderr.decode())
-            exit()
-
         # Define the n of random bytes between original-encrypted ones
-        separacion = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
-        if int(separacion) < 1:
+        padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
+        if int(padding) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
+        
+        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing Binary Shuffle')
 
-        def encriptar(file, separacion):
-            with open("tempfile", "w") as f: # grep the binary file content
-                subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7 | tr -d ' ' | tr -d '\n'"], shell=True, stdout=f)
+        binary_content = read_binary(target)
+        # Generate random list
+        random_list = random_list(len(binary_content), password)
+        # Reorganize bynary string
+        binary_shuffle = reorganize_string(binary_content, random_list)
 
-            def insertar_aleatorios(separacion):
+        def encriptar(file, padding):
+ 
+            def insertar_aleatorios(padding):
                 print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Injecting random bits")
-                with open("tempfile", "r") as f:
-                    binary_data = f.read()
+                binary_shuffle
                 encrypted_data = []
-                encrypted_data.extend(random.choices('01', k=separacion))
+                random.seed(time.time())
+                encrypted_data.extend(random.choices('01', k=padding))
 
-                for bit in binary_data:
+                for bit in binary_shuffle:
                     encrypted_data.append('1' if bit == '0' else '0') # add reversed bit
-                    encrypted_data.extend(random.choices('01', k=separacion)) # generate random bit/s
-
+                    encrypted_data.extend(random.choices('01', k=padding)) # generate random bit/s
                 return ''.join(encrypted_data) # join all bits
             
-            subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
+            with open(target, "w") as empty:
+                empty.write("")
             with open(file, "wb") as f:
-                encrypted_data = insertar_aleatorios(separacion) # Call the function to invert and fill
+                encrypted_data = insertar_aleatorios(padding) # Call the function to invert and fill
                 byte_data = bits_to_bytes(encrypted_data) # Call the function to convert bits to bytes
                 f.write(byte_data)
                 
@@ -95,45 +135,24 @@ while choice != "3":
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bits to bytes") 
             return bytes(int(bit_string[i:i+8], 2) for i in range(0, len(bit_string), 8))
 
-        encriptar(f"{target}.tar.enc", separacion) # AES-256 | invert | fill | bits->bytes
+        encriptar(f"{target}", padding) # Binary Shuffle | invert | fill | bits->bytes
 
-        def generar_secuencia_aleatoria_con_contraseña(contraseña):
-            # Generar la primera columna permutada según la contraseña
-            primera_columna = list(range(256))
-            hash_contraseña = hashlib.sha256(contraseña.encode()).digest()
-            random_seed = int.from_bytes(hash_contraseña, 'big')
-            random.seed(random_seed)
-            random.shuffle(primera_columna)
+        random_secuence = random_secuence(password)
 
-            # Generar la segunda columna fija
-            segunda_columna = [format(i, '08b') for i in range(256)]
-
-            # Combinar las dos columnas en una lista de cadenas
-            secuencia_aleatoria = [f"{primera_columna[i]} {segunda_columna[i]}" for i in range(256)]
-
-            return secuencia_aleatoria
-
-        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password)
-
-        with open("llave.txt", "w", encoding='utf-8') as f:
-            for fila in secuencia_aleatoria:
+        with open("key", "w", encoding='utf-8') as f:
+            for fila in random_secuence:
                 f.write(f"{fila}\n")
-
-        with open("tempfile", "w") as f:
-            subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7"], shell=True, stdout=f)
-        
-        with open("tempfile", "r") as f:
-            binary_data = ''.join(char for char in f.read() if char in ['0', '1'])
-
+            
+        binary_data = read_binary(target)
         key = {}
-        with open("llave.txt", "r") as key_file:
+        with open("key", "r") as key_file:
             for line in key_file:
                 value, binary = line.strip().split()
                 key[binary] = int(value)
 
-
-        subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
-        with open(f"{target}.tar.enc", "a") as encoded_file:
+        with open(target, "w") as empty:
+            empty.write("")
+        with open(target, "ab") as encoded_file:
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bytes to referenced decimal number") 
             block_size = 8
             for i in range(0, len(binary_data), block_size):
@@ -141,32 +160,28 @@ while choice != "3":
                 decimal_value = key.get(block)  
                 decimal_output = str(decimal_value) + "\n"
                 
-                encoded_file.write(decimal_output)
+                encoded_file.write(bytes([int(decimal_output)]))
 
-        subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
-        print(bcolors.WHITE+"[" + bcolors.RED+"@" + bcolors.WHITE+"]" +bcolors.WHITE+ " Compressing...")
-        subprocess.run([f"xz -9 {target}.tar.enc"], shell=True)
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {separacion} & saved as '{target}.tar.enc'.")
-
+        os.remove("key")
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {padding} & saved as '{target}'.")
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
         exit()
                 
-    if choice == "2": # Repeats 1 but process is reversed
+    if choice == "2": # Repeats 1 -> process is reversed
 
         def bits_to_bytes(bit_string):
             return bytes(int(bit_string[i:i+8], 2) for i in range(0, len(bit_string), 8))
 
-        def desencriptar(file, separacion):
-            with open("tempfile", 'w') as f:
-                subprocess.run(["xxd -b "+f"{target}.tar.enc"+" | cut -d' ' -f2- | cut -d' ' -f1-7 | tr -d ' ' | tr -d '\n'"], shell=True, stdout=f)
+        def decrypt(file, padding):
             
-            with open("tempfile", "r") as f:
-                binary_data = f.read()
-                inverted_data = ''.join('1' if bit == '0' else '0' for bit in binary_data)
+            with open(file, 'rb') as f:
+                bytes = f.read()
+                inverted_data = ''.join('1' if bit == '0' else '0' for byte in bytes for bit in format(byte, '08b'))
 
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")    
-            original_data = "".join(inverted_data[separacion::(separacion+1)])
+            original_data = "".join(inverted_data[padding::(padding+1)])
             numeroactual = 0
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bits to bytes")
             while numeroactual <= len(original_data):
                 numeroactual += 8
             
@@ -177,50 +192,37 @@ while choice != "3":
                 decrypted_bytes = bits_to_bytes(original_data[:-(len(original_data)-numeroactual)])
 
 
-            subprocess.run(["rm "+f"{target}.tar.enc"], shell=True)
+            with open(target, "w") as empty:
+                empty.write("")
             with open(file, "wb") as f:
                 f.write(decrypted_bytes)
     
             
 
-        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name (exclude .tar.enc): ")
+        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
         password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
-        separacion = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
+        padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
 
-        if int(separacion) < 1:
+        if int(padding) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
 
-        print(bcolors.WHITE+"[" + bcolors.RED+"@" + bcolors.WHITE+"]" +bcolors.WHITE+ " Desompressing...")
-        subprocess.run([f"xz -d {target}.tar.enc.xz"], shell=True)
 
-        def generar_secuencia_aleatoria_con_contraseña(contraseña):
-            # Generar la primera columna permutada según la contraseña
-            primera_columna = list(range(256))
-            hash_contraseña = hashlib.sha256(contraseña.encode()).digest()
-            random_seed = int.from_bytes(hash_contraseña, 'big')
-            random.seed(random_seed)
-            random.shuffle(primera_columna)
+        random_secuence = random_secuence(password)
 
-            # Generar la segunda columna fija
-            segunda_columna = [format(i, '08b') for i in range(256)]
-
-            # Combinar las dos columnas en una lista de cadenas
-            secuencia_aleatoria = [f"{primera_columna[i]} {segunda_columna[i]}" for i in range(256)]
-
-            return secuencia_aleatoria
-
-        secuencia_aleatoria = generar_secuencia_aleatoria_con_contraseña(password)
-
-        with open("llave.txt", "w", encoding='utf-8') as f:
-            for fila in secuencia_aleatoria:
+        with open("key", "w", encoding='utf-8') as f:
+            for fila in random_secuence:
                 f.write(f"{fila}\n")
 
-        with open(f"{target}.tar.enc", "r") as encoded_file:
-            decimal_values = encoded_file.read().split("\n")
+        with open(target, "rb") as encoded_file:
+            # reads content as bytes secuence
+            byte_content = encoded_file.read()
+            decimal_values = []
+            for byte in byte_content:
+                decimal_values.append(str(byte))
 
         key = {}
-        with open("llave.txt", "r") as key_file:
+        with open("key", "r") as key_file:
             for line in key_file:
                 value, binary = line.strip().split()
                 key[binary] = int(value)
@@ -228,9 +230,10 @@ while choice != "3":
         inverse_key = {value: binary for binary, value in key.items()}
         decimal_values = [value for value in decimal_values if value.strip()]
 
-        subprocess.run(["rm", f"{target}.tar.enc"])
+        with open(target, "w") as empty:
+            empty.write("")
 
-        with open(f"{target}.tar.enc", "ab") as reconstructed_file:
+        with open(target, "ab") as reconstructed_file:
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting decimal number to bytes referenced")
             for decimal_value in decimal_values:
                 binary_block = inverse_key.get(int(decimal_value), "Unknown")  
@@ -239,19 +242,27 @@ while choice != "3":
                     reconstructed_file.write(bytes([decimal_value]))
 
    
-        desencriptar(f"{target}.tar.enc", separacion)
-        subprocess.run(["rm llave.txt && rm tempfile"], shell=True)
+        decrypt(f"{target}", padding)
+        os.remove("key")
         
-        cmd = f'pv -W {target}.tar.enc | openssl enc -aes-256-cbc -d -md sha512 -pbkdf2 -iter 1000000 -salt -in - -k "{password}" | tar xzvf - && rm {target}.tar.enc'
+        def restaurar_string(string, random_list):
+            string_original = [None] * len(string)
+            for i, index in enumerate(random_list):
+                string_original[i] = string[index - 1]
+            return ''.join(string_original)
         
-        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing AES-256')
-        try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as e:
-            print(bcolors.RED + "Error:", e.stderr.decode())
-            exit()
-        
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{target}'.")
+        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Reverting Binary Shuffle')
+        binary_content = read_binary(target)
+        random_list = random_list(len(binary_content), password)
+        revert_binary_shuffle = restaurar_string(binary_content, random_list)
+
+        with open(target, "w") as empty:
+            empty.write("")
+        with open(target, "ab") as reconstructed_file:
+            byte_data = bytes(int(revert_binary_shuffle[i:i+8], 2) for i in range(0, len(revert_binary_shuffle), 8))
+            reconstructed_file.write(byte_data)
+
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{target}'")
 
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
         exit()
