@@ -24,7 +24,7 @@ openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -salt -out {target}.ta
 
 # Graphical explanation
 
-![2024-04-18-204400_1181x931_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/5cafdac8-17a3-401b-ac9b-4586aca26bae)
+![diagram drawio](https://github.com/Locotir/LCRYPT/assets/71979632/5b7fac5b-3bf6-40b9-a3ef-24c0a0087db9)
 
 
 ### Target
