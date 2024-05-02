@@ -89,6 +89,8 @@ while choice != "3":
 
     # Capture user num. input
     choice = getch()
+    if isinstance(choice, bytes):
+        choice = choice.decode("utf-8")
 
     if choice == "1":
 
