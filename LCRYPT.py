@@ -39,7 +39,12 @@ sys.path.append(os.path.realpath("."))
 def exit():
     sys.exit("\nExiting...")
 
-
+def verify_exists(file):
+    if os.path.exists(file):
+        pass
+    else:
+        print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" File '{file}' not found")
+        exit()
 
 def random_list(lenght, passwd):
     hash_obj = hashlib.sha256(passwd.encode())
@@ -140,6 +145,7 @@ while choice != "3":
 
         # Define the target to encryot [ file or folder ]
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
+        verify_exists(target)
         password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         # Define the n of random bytes between original-encrypted ones
         padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
@@ -252,6 +258,7 @@ while choice != "3":
             
 
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
+        verify_exists(target)
         password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
         start_time = time.time()
