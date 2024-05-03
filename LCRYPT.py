@@ -1,11 +1,12 @@
 from getch import getch
 from getpass import getpass
 import hashlib
-import subprocess
 import sys
 import os
 import random
 import time
+import shutil
+import tarfile
 
 class bcolors:
     PURPLE = '\033[95m' 
@@ -76,7 +77,48 @@ def random_secuence(passwd):
     random_secuence = [f"{first_column[i]} {second_column[i]}" for i in range(256)]
 
     return random_secuence
-    
+
+def empty_file():
+    with open(target, "w") as empty:
+        empty.write("")
+
+
+def tar_compression(file):
+    print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Compressing')
+    try:
+        # make tar file
+        with tarfile.open(f"{file}.tar.gz", "w:gz") as tar:
+            tar.add(file, arcname=os.path.basename(file))
+        # Delete original file
+        if os.path.isdir(file):
+            shutil.rmtree(file)
+        elif os.path.isfile(file):
+            os.remove(file)
+        shutil.move(f"{file}.tar.gz", f"{file}")
+    except Exception as e:
+        print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" Error on compression: {e}")
+        exit()
+
+def tar_decompression(file):
+    print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Decompressing')
+    try:
+        shutil.move(f"{file}", f"{file}.tar.gz")
+        # extract tar.gz file
+        with tarfile.open(f"{file}.tar.gz", "r:gz") as tar:
+            tar.extractall(path=os.path.dirname(file))
+            extracted_files = tar.getnames()
+
+        # Obtenemos el nombre del último archivo extraído
+        if extracted_files:
+            last_extracted_file = extracted_files[-1]
+            final_output_name = os.path.basename(last_extracted_file)
+        os.remove(f"{file}.tar.gz")
+        os.remove(f'{file}.backup')
+        return final_output_name
+    except Exception as e:
+        print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" Incorrect passwd | Backup file saved as {file}.backup")
+        os.remove(f"{file}.tar.gz")
+        exit()
 
 
 # Menu
@@ -91,7 +133,7 @@ while choice != "3":
     choice = getch()
     if isinstance(choice, bytes):
         choice = choice.decode("utf-8")
-
+        
     if choice == "1":
 
         # Define the target to encryot [ file or folder ]
@@ -99,11 +141,14 @@ while choice != "3":
         password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         # Define the n of random bytes between original-encrypted ones
         padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
+        start_time = time.time()
         if int(padding) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
             exit()
         
         print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing Binary Shuffle')
+
+        tar_compression(target)
 
         binary_content = read_binary(target)
         # Generate random list
@@ -125,8 +170,7 @@ while choice != "3":
                     encrypted_data.extend(random.choices('01', k=padding)) # generate random bit/s
                 return ''.join(encrypted_data) # join all bits
             
-            with open(target, "w") as empty:
-                empty.write("")
+            empty_file()
             with open(file, "wb") as f:
                 encrypted_data = insertar_aleatorios(padding) # Call the function to invert and fill
                 byte_data = bits_to_bytes(encrypted_data) # Call the function to convert bits to bytes
@@ -152,8 +196,7 @@ while choice != "3":
                 value, binary = line.strip().split()
                 key[binary] = int(value)
 
-        with open(target, "w") as empty:
-            empty.write("")
+        empty_file()
         with open(target, "ab") as encoded_file:
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bytes to referenced decimal number") 
             block_size = 8
@@ -167,6 +210,12 @@ while choice != "3":
         os.remove("key")
         print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file with padding {padding} & saved as '{target}'.")
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        hours, remainder = divmod(elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        print("\n{:.0f}h | {:.0f}m | {:.2f}s".format(hours, minutes, seconds))
+
         exit()
                 
     if choice == "2": # Repeats 1 -> process is reversed
@@ -194,8 +243,7 @@ while choice != "3":
                 decrypted_bytes = bits_to_bytes(original_data[:-(len(original_data)-numeroactual)])
 
 
-            with open(target, "w") as empty:
-                empty.write("")
+            empty_file()
             with open(file, "wb") as f:
                 f.write(decrypted_bytes)
     
@@ -204,6 +252,10 @@ while choice != "3":
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
         password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
+        start_time = time.time()
+
+        # Recover file in case of unsuccesfull decryption
+        shutil.copy(f"{target}", f"{target}.backup")
 
         if int(padding) < 1:
             print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
@@ -232,8 +284,7 @@ while choice != "3":
         inverse_key = {value: binary for binary, value in key.items()}
         decimal_values = [value for value in decimal_values if value.strip()]
 
-        with open(target, "w") as empty:
-            empty.write("")
+        empty_file()
 
         with open(target, "ab") as reconstructed_file:
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting decimal number to bytes referenced")
@@ -258,13 +309,19 @@ while choice != "3":
         random_list = random_list(len(binary_content), password)
         revert_binary_shuffle = restaurar_string(binary_content, random_list)
 
-        with open(target, "w") as empty:
-            empty.write("")
+        empty_file()
         with open(target, "ab") as reconstructed_file:
             byte_data = bytes(int(revert_binary_shuffle[i:i+8], 2) for i in range(0, len(revert_binary_shuffle), 8))
             reconstructed_file.write(byte_data)
+        
+        file = tar_decompression(target)
 
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{target}'")
-
+        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{file}'")
         print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        hours, remainder = divmod(elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        print("\n{:.0f}h | {:.0f}m | {:.2f}s".format(hours, minutes, seconds))
+
         exit()
