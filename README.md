@@ -1,8 +1,13 @@
 # LCRYPT
 Unbreakable encryption combinations
 
-### Requirements
-getch==1.0
+### Installation & Run
+```
+git clone https://github.com/Locotir/LCRYPT
+cd LCRYPT
+pip3 install -r requirements.txt
+python LCRYPT.py
+```
 
 ### Targets accepted
 All type of files and folders
