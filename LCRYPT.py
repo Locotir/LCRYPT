@@ -1,5 +1,5 @@
 from getch import getch
-from getpass import getpass
+import pwinput
 import hashlib
 import sys
 import os
@@ -7,6 +7,7 @@ import random
 import time
 import shutil
 import tarfile
+
 
 class bcolors:
     PURPLE = '\033[95m' 
@@ -37,6 +38,7 @@ sys.path.append(os.path.realpath("."))
 
 def exit():
     sys.exit("\nExiting...")
+
 
 
 def random_list(lenght, passwd):
@@ -133,12 +135,12 @@ while choice != "3":
     choice = getch()
     if isinstance(choice, bytes):
         choice = choice.decode("utf-8")
-        
+
     if choice == "1":
 
         # Define the target to encryot [ file or folder ]
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
-        password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
+        password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         # Define the n of random bytes between original-encrypted ones
         padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
         start_time = time.time()
@@ -250,7 +252,7 @@ while choice != "3":
             
 
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
-        password = getpass(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
+        password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
         start_time = time.time()
 
