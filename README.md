@@ -1,5 +1,5 @@
 # LCRYPT
-Unbreakable encryption combinations
+Unbreakable encryption on binary level even knowing the procedure.
 
 ### Installation & Run
 ```
