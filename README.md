@@ -1,5 +1,6 @@
 # LCRYPT
 Unbreakable encryption on binary level even knowing the procedure.
+Knowing that all information in digital format is stored in its purest form of zeros and ones, I began to contemplate how to effectively erase the contents of a file, ensuring it can be decrypted using the correct keys. Without them, deciphering it would be like rewriting a dictionary from a huge alphabet soup.
 
 ### Installation & Run
 ```
@@ -32,21 +33,16 @@ This program is provided for educational and research purposes only. The user as
 
 ### Target
 
-![2024-05-02-163611_727x95_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/9601ef10-7995-40af-995a-dc3433d91252)
+![2024-05-07-000109_697x296_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/48685058-c9b7-4565-a381-7435719966e0)
 
-### After ++Bit/s randomized filled & Randomiced decimal (0-255) for earch Byte chain number referenced
+### After compressing the target, shuffling, applying bit padding, converting bytes to decimal reference numbers, and saving in binary format.
 
-![2024-05-02-163755_756x137_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/657bd28c-9b20-44f6-8a49-c2fdb699f308)
+![2024-05-07-000339_709x295_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/beb6b2ce-8e01-4ae5-a8aa-4e8e1866910e)
 
 
 ### Console preview
 
-![2024-05-02-163956_596x535_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/a3744023-f772-437d-b438-a4a1c6fb02c2)
-
-
-### All the process on hex content view
-
-![2024-05-02-164206_688x103_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/8137064b-ed47-4649-bbb1-aca2795732b0)
+![2024-05-07-001212_639x604_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/38a3e851-074c-412c-b71f-7b4832c88d6f)
 
 
 
