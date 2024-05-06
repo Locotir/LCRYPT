@@ -123,7 +123,7 @@ def tar_decompression(file):
         os.remove(f'{file}.backup')
         return final_output_name
     except Exception as e:
-        print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" Incorrect passwd | Backup file saved as {file}.backup")
+        print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" Incorrect passwd or padding | Backup file saved as {file}.backup")
         os.remove(f"{file}.tar.gz")
         exit()
 
@@ -148,39 +148,45 @@ while choice != "3":
         verify_exists(target)
         password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
         # Define the n of random bytes between original-encrypted ones
-        padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
-        start_time = time.time()
-        if int(padding) < 1:
-            print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
+        try:
+            padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
+        except:
+            print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
             exit()
-        
-        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing Binary Shuffle')
+        start_time = time.time()
 
         tar_compression(target)
 
+        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Executing Binary Shuffle')
         binary_content = read_binary(target)
         # Generate random list
         random_list = random_list(len(binary_content), password)
         # Reorganize bynary string
         binary_shuffle = reorganize_string(binary_content, random_list)
 
-        def encriptar(file, padding):
+        def encrypt(file, padding):
  
-            def insertar_aleatorios(padding):
-                print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Injecting random bits")
+            def random_insert(padding):
                 binary_shuffle
                 encrypted_data = []
-                random.seed(time.time())
-                encrypted_data.extend(random.choices('01', k=padding))
+                if padding == 0:
+                    print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Not injecting random bits")
+                    for bit in binary_shuffle:
+                        encrypted_data.append('1' if bit == '0' else '0')
+                    return ''.join(encrypted_data)
+                else:
+                    print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Injecting random bits")
+                    random.seed(time.time())
+                    encrypted_data.extend(random.choices('01', k=padding))
 
-                for bit in binary_shuffle:
-                    encrypted_data.append('1' if bit == '0' else '0') # add reversed bit
-                    encrypted_data.extend(random.choices('01', k=padding)) # generate random bit/s
-                return ''.join(encrypted_data) # join all bits
+                    for bit in binary_shuffle:
+                        encrypted_data.append('1' if bit == '0' else '0') # add reversed bit
+                        encrypted_data.extend(random.choices('01', k=padding)) # generate random bit/s
+                    return ''.join(encrypted_data) # join all bits
             
             empty_file()
             with open(file, "wb") as f:
-                encrypted_data = insertar_aleatorios(padding) # Call the function to invert and fill
+                encrypted_data = random_insert(padding) # Call the function to invert and fill
                 byte_data = bits_to_bytes(encrypted_data) # Call the function to convert bits to bytes
                 f.write(byte_data)
                 
@@ -189,7 +195,7 @@ while choice != "3":
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bits to bytes") 
             return bytes(int(bit_string[i:i+8], 2) for i in range(0, len(bit_string), 8))
 
-        encriptar(f"{target}", padding) # Binary Shuffle | invert | fill | bits->bytes
+        encrypt(target, padding) # Binary Shuffle | invert | fill | bits->bytes
 
         random_secuence = random_secuence(password)
 
@@ -233,42 +239,46 @@ while choice != "3":
 
         def decrypt(file, padding):
             
-            with open(file, 'rb') as f:
-                bytes = f.read()
-                inverted_data = ''.join('1' if bit == '0' else '0' for byte in bytes for bit in format(byte, '08b'))
-
-            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")    
-            original_data = "".join(inverted_data[padding::(padding+1)])
-            numeroactual = 0
+            def read_file():    
+                with open(file, 'rb') as f:
+                    bytes = f.read()
+                    inverted_data = ''.join('1' if bit == '0' else '0' for byte in bytes for bit in format(byte, '08b'))
+                    return inverted_data    
+            
             print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Converting bits to bytes")
-            while numeroactual <= len(original_data):
-                numeroactual += 8
-            
-            if numeroactual == len(original_data):
-                decrypted_bytes = bits_to_bytes(original_data)
+
+            def ajustment(data):
+                length = len(data)
+                remainder = length % 8
+                if remainder == 0:
+                    decrypted_bytes = bits_to_bytes(data)
+                else:
+                    decrypted_bytes = bits_to_bytes(data[:-remainder])
+                empty_file() 
+                with open(file, "wb") as f:
+                    f.write(decrypted_bytes)
+
+            if padding != 0:
+                print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")
+                original_data = read_file()
+                adjusted_data = "".join(original_data[i] for i in range(padding, len(original_data), padding + 1))
+                ajustment(adjusted_data)
             else:
-                numeroactual -= 8
-                decrypted_bytes = bits_to_bytes(original_data[:-(len(original_data)-numeroactual)])
-
-
-            empty_file()
-            with open(file, "wb") as f:
-                f.write(decrypted_bytes)
-    
-            
+                print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Not removing random bits")
+                ajustment(read_file())
 
         target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
         verify_exists(target)
         password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
-        padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value: "))
+        try:
+            padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
+        except:
+            print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
+            exit()
         start_time = time.time()
 
         # Recover file in case of unsuccesfull decryption
-        shutil.copy(f"{target}", f"{target}.backup")
-
-        if int(padding) < 1:
-            print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be an integer equal to or greater than 1.")
-            exit()
+        shutil.copy(target, f"{target}.backup")
 
 
         random_secuence = random_secuence(password)
@@ -304,10 +314,10 @@ while choice != "3":
                     reconstructed_file.write(bytes([decimal_value]))
 
    
-        decrypt(f"{target}", padding)
+        decrypt(target, padding)
         os.remove("key")
         
-        def restaurar_string(string, random_list):
+        def restore_string(string, random_list):
             string_original = [None] * len(string)
             for i, index in enumerate(random_list):
                 string_original[i] = string[index - 1]
@@ -316,7 +326,7 @@ while choice != "3":
         print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Reverting Binary Shuffle')
         binary_content = read_binary(target)
         random_list = random_list(len(binary_content), password)
-        revert_binary_shuffle = restaurar_string(binary_content, random_list)
+        revert_binary_shuffle = restore_string(binary_content, random_list)
 
         empty_file()
         with open(target, "ab") as reconstructed_file:
