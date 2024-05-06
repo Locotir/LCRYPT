@@ -31,7 +31,7 @@ This program is provided for educational and research purposes only. The user as
 ![diagram drawio](https://github.com/Locotir/LCRYPT/assets/71979632/5b7fac5b-3bf6-40b9-a3ef-24c0a0087db9)
 
 
-### Target
+# Target
 
 ![2024-05-07-000109_697x296_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/48685058-c9b7-4565-a381-7435719966e0)
 
@@ -40,7 +40,7 @@ This program is provided for educational and research purposes only. The user as
 ![2024-05-07-000339_709x295_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/beb6b2ce-8e01-4ae5-a8aa-4e8e1866910e)
 
 
-### Console preview
+# Console preview
 
 ![2024-05-07-001212_639x604_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/38a3e851-074c-412c-b71f-7b4832c88d6f)
 
