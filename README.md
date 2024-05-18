@@ -1,4 +1,4 @@
-#LCRYPT: Unbreakable Encryption at the Binary Level
+# LCRYPT: Unbreakable Encryption at the Binary Level
 In the digital age, securing information at its most fundamental level is paramount. Recognizing that all data ultimately translates to binary code, LCRYPT presents a groundbreaking encryption solution designed to safeguard data integrity and confidentiality. Even with full knowledge of the encryption process, unauthorized access remains an insurmountable challenge without the corresponding decryption keys.
 
 ### Description
