@@ -33,16 +33,16 @@ This program is provided for educational and research purposes only. The user as
 
 # Target
 
-![2024-05-07-000109_697x296_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/48685058-c9b7-4565-a381-7435719966e0)
+![2024-05-18-192525_712x292_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/f84e40bb-97ce-4809-88d7-7b84750840ee)
 
 ### After compressing the target, shuffling, applying bit padding, converting bytes to decimal reference numbers, and saving in binary format.
 
-![2024-05-07-000339_709x295_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/beb6b2ce-8e01-4ae5-a8aa-4e8e1866910e)
+![2024-05-18-192236_696x295_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/18fc078e-3852-4f36-a096-ceb9904af482)
 
 
 # Console preview
 
-![2024-05-07-001212_639x604_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/38a3e851-074c-412c-b71f-7b4832c88d6f)
+![2024-05-18-192505_888x609_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/92ab5415-f93b-47c2-99bb-0b71b5433283)
 
 
 
