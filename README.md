@@ -1,13 +1,18 @@
 #LCRYPT: Unbreakable Encryption at the Binary Level
+In the digital age, securing information at its most fundamental level is paramount. Recognizing that all data ultimately translates to binary code, LCRYPT presents a groundbreaking encryption solution designed to safeguard data integrity and confidentiality. Even with full knowledge of the encryption process, unauthorized access remains an insurmountable challenge without the corresponding decryption keys.
 
 ### Description
-LCRYPT offers unbreakable encryption at the binary level, securing data integrity and confidentiality. Even with knowledge of the encryption procedure, data remains inaccessible without the appropriate keys. This project aims to provide a robust mechanism for file encryption, ensuring that sensitive information remains protected against unauthorized access attempts, thus upholding the highest security standards.
+LCRYPT offers a robust mechanism to secure files by encrypting them at the binary level. This ensures that sensitive information remains protected against unauthorized access attempts, aligning with the highest standards of data security. The encryption process renders the content indecipherable without the appropriate keys, making it akin to deciphering a dictionary submerged in an alphabet soup.
 
-### Rreverse Engineering
-Decryption attempts are thwarted by the lack of identifiable marks left by the encryption tool. Each bit, not byte, is randomly altered from its original position, making manual decryption virtually impossible without the original encryption tool.
+The primary objective of LCRYPT is to provide an impenetrable barrier, effectively "wiping" the contents of a file, and enabling recovery solely through authorized decryption. This approach guarantees that even with extensive knowledge of the encryption procedure, attempting manual decryption without the requisite keys is as futile as reconstructing a vast dictionary from a jumbled mass of letters.
 
-### Trying Brute Forcing
-Attempting decryption without the keys is time-prohibitive. Even with advanced computing power, such as quantum computing, the sheer number of possible combinations renders brute force decryption unfeasible. For instance, decrypting a file with padding setting 5 using a quantum machine could take over 77,000 years.
+### Rreverse Engineering Considerations
+Any attempt at reverse engineering LCRYPT-encrypted files faces significant hurdles. Without leaving identifiable marks or traces of the encryption method employed, discerning the encryption algorithm proves exceptionally challenging. Each byte within the encrypted file corresponds to a decimal number within the range of 0 to 255, representing all possible 8-bit combinations. The complexity of the encryption process goes beyond simply manipulating the position of each bit, rendering manual decryption unfeasible without the original encryption tool.
+
+### Brute Forcing Analysis
+For adversaries equipped with the LCRYPT tool, decrypting files through brute force entails exhaustive attempts with varying padding settings. However, the sheer magnitude of possible combinations, combined with the computational resources required, presents formidable obstacles. Even assuming a generous timeframe for each decryption attempt, the endeavor becomes a test of endurance.
+
+In scenarios involving quantum computing, theoretical speed enhancements pose additional challenges. Despite speculative advancements in computational power, the exponential complexity of LCRYPT encryption remains a formidable barrier. Hypothetical comparisons underscore the monumental effort required, emphasizing the impregnability of LCRYPT's encryption methodology.
 
 
 
