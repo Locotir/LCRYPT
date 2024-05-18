@@ -1,6 +1,15 @@
-# LCRYPT
-Unbreakable encryption on binary level even knowing the procedure.
-Knowing that all information in digital format is stored in its purest form of zeros and ones, I began to contemplate how to effectively erase the contents of a file, ensuring it can be decrypted using the correct keys. Without them, deciphering it would be like rewriting a dictionary from a huge alphabet soup.
+#LCRYPT: Unbreakable Encryption at the Binary Level
+
+### Description
+LCRYPT offers unbreakable encryption at the binary level, securing data integrity and confidentiality. Even with knowledge of the encryption procedure, data remains inaccessible without the appropriate keys. This project aims to provide a robust mechanism for file encryption, ensuring that sensitive information remains protected against unauthorized access attempts, thus upholding the highest security standards.
+
+### Rreverse Engineering
+Decryption attempts are thwarted by the lack of identifiable marks left by the encryption tool. Each bit, not byte, is randomly altered from its original position, making manual decryption virtually impossible without the original encryption tool.
+
+### Trying Brute Forcing
+Attempting decryption without the keys is time-prohibitive. Even with advanced computing power, such as quantum computing, the sheer number of possible combinations renders brute force decryption unfeasible. For instance, decrypting a file with padding setting 5 using a quantum machine could take over 77,000 years.
+
+
 
 ### Installation & Run
 ```
