@@ -3,13 +3,7 @@
 In the digital age, securing data at its core is crucial. LCRYPT offers a revolutionary encryption solution that protects data at the binary level, ensuring integrity and confidentiality. Unauthorized access is impossible without the decryption keys.
 
 ### Description
-LCRYPT encrypts files at the binary level, making data indecipherable without the correct keys. This method provides top-tier security, rendering manual decryption futile without the appropriate keys.
-
-### Reverse Engineering Considerations
-LCRYPT-encrypted files resist reverse engineering due to their complexity. Each byte is shuffled randomly and corresponds to a value between 0 and 255, complicating decryption attempts without the original tool.
-
-### Brute Forcing Analysis
-Even with the LCRYPT tool, brute force decryption is impractical due to the vast number of possible combinations and required computational resources. The encryption's complexity remains a significant barrier, even against quantum computing advancements.
+LCRYPT encrypts files at the binary level, making data indecipherable without the correct keys. This method provides top-tier security, rendering manual decryption futile without the appropriate keys. LCRYPT-encrypted files resist reverse engineering due to their complexity. Each byte is shuffled randomly and corresponds to a value between 0 and 255, complicating decryption attempts without the original tool. Even with the LCRYPT tool, brute force decryption is impractical due to the vast number of possible combinations and the required computational resources. The encryption's complexity remains a significant barrier, even against advancements in quantum computing.
 
 
 ### Installation & Run
