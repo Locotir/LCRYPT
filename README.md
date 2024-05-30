@@ -26,11 +26,11 @@ This program is provided for educational and research purposes only. The user as
 
 ### $${\color{white}[ \color{red}@ \color{white}{]} \space Binary \space Shuffle}$$
 
-### [@] Reverse Binary Chain
+### $${\color{white}[ \color{red}@ \color{white}{]} \space Reverse \space Binary \space Chain}$$ 
 
-### [@] Fill whith bits between each original bit
+### $${\color{white}[ \color{red}@ \color{white}{]} \space Fill \space whith \space bits \space between \space each \space original \space bit}$$ 
 
-### [@] Convert each 8bit string to decimal (0-255):Psswd randomized
+### $${\color{white}[ \color{red}@ \color{white}{]} \space Convert \space each \space 8bit \space string \space to \space decimal \space \color{lightgreen}(0-255):Psswd \space \color{white}randomized}$$ 
 
 # Graphical Explanation
 
