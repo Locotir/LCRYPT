@@ -24,7 +24,7 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
 
-### [@] Binary Shuffle
+### [$${\color{red}@}$$] Binary Shuffle
 
 ### [@] Reverse Binary Chain
 
