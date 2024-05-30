@@ -24,13 +24,13 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
 
-### | Binary Shuffle
+### [@] Binary Shuffle
 
-### | Reverse Binary Chain
+### [@] Reverse Binary Chain
 
-### | Fill whith bits between each original bit
+### [@] Fill whith bits between each original bit
 
-### | Convert each 8bit string to decimal (0-255):Psswd randomized
+### [@] Convert each 8bit string to decimal (0-255):Psswd randomized
 
 # Graphical Explanation
 
