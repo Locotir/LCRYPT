@@ -27,15 +27,15 @@ class bcolors:
 # Clear terminal
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
-cls()
 
-print("\n")                                                             
-print(bcolors.GREEN+" ██╗      ██████╗██████╗ ██╗   ██╗██████╗ ████████╗")
-print(bcolors.GREEN+" ██║     ██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝")
-print(bcolors.GREEN+" ██║     ██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   ")
-print(bcolors.GREEN+" ██║     ██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   ")
-print(bcolors.GREEN+" ███████╗╚██████╗██║  ██║   ██║   ██║        ██║   ")
-print(bcolors.GREEN+" ╚══════╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   ")
+def logo():    
+    print("\n")                                                             
+    print(bcolors.GREEN+" ██╗      ██████╗██████╗ ██╗   ██╗██████╗ ████████╗")
+    print(bcolors.GREEN+" ██║     ██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝")
+    print(bcolors.GREEN+" ██║     ██║     ██████╔╝ ╚████╔╝ ██████╔╝   ██║   ")
+    print(bcolors.GREEN+" ██║     ██║     ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   ")
+    print(bcolors.GREEN+" ███████╗╚██████╗██║  ██║   ██║   ██║        ██║   ")
+    print(bcolors.GREEN+" ╚══════╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝   ")
 
 sys.path.append(os.path.realpath("."))
 
@@ -55,9 +55,6 @@ def read_binary(file):
     binary_content = ''.join(format(byte, '08b') for byte in bytes)
     return binary_content
 
-
-def empty_file():
-    open(target, 'wb').close()
 
 
 def tar_compression(file):
@@ -229,7 +226,7 @@ def generate_random_sequence(password, length):
     random.seed(digest)
     return random.sample(range(length), length)
 
-def process_byte_padding(byte, positions):
+def process_byte_padding(byte, positions, padding):
     scrambled_byte = ['0'] * 8
     for i, pos in enumerate(positions):
         scrambled_byte[i] = ''.join(random.choices('01', k=padding)) + byte[pos]
@@ -247,11 +244,12 @@ def reverse_byte(byte, positions):
         unscrambled_byte[pos] = byte[i]
     return ''.join(unscrambled_byte)
 
+
 def process_block(args):
-    block_index, block, positions, scramble = args
+    block_index, block, positions, scramble, padding = args
     if scramble:
         if padding != 0:
-            processed_block = [process_byte_padding(format(byte, '08b'), positions) for byte in block]
+            processed_block = [process_byte_padding(format(byte, '08b'), positions, padding) for byte in block]
         else:
             processed_block = [process_byte(format(byte, '08b'), positions) for byte in block]
     else:
@@ -260,8 +258,9 @@ def process_block(args):
 
 
 # Byte shuffle
-def process_file(source, target, password, scramble=True, progress_interval=0.1, block_size=4096, num_processes=8):
+def process_file(source, target, password, padding, scramble=True, progress_interval=0.1, block_size=4096, num_processes=8):
     total_size = os.path.getsize(source)
+
     if padding != 0 and scramble == False:
         total_size = total_size
     elif padding != 0 and scramble == True:
@@ -278,10 +277,11 @@ def process_file(source, target, password, scramble=True, progress_interval=0.1,
             block = src.read(block_size)
             if not block:
                 break
-            positions = generate_random_sequence(password + str(block_index), 8)
-            blocks.append((block_index, block, positions, scramble))
+            positions = generate_random_sequence(str(password) + str(block_index), 8)
+            blocks.append((block_index, block, positions, scramble, padding))
             block_index += 1
 
+    
     with multiprocessing.Pool(processes=num_processes) as pool:
         processed_blocks = pool.map(process_block, blocks)
 
@@ -320,124 +320,130 @@ def process_file(source, target, password, scramble=True, progress_interval=0.1,
             tgt.write(buffer.popleft())
 
 # Function to scramble a file
-def scramble_file(source, target, password, progress_interval=0.01, block_size=4096):
-    process_file(source, target, password, scramble=True, progress_interval=progress_interval, block_size=block_size)
+def scramble_file(source, target, password, padding, progress_interval=0.01, block_size=4096):
+    process_file(source, target, password, padding, scramble=True, progress_interval=progress_interval, block_size=block_size)
 
 # Function to unscramble a file
-def unscramble_file(source, target, password, progress_interval=0.01, block_size=4096):
-    process_file(source, target, password, scramble=False, progress_interval=progress_interval, block_size=block_size)
+def unscramble_file(source, target, password, padding, progress_interval=0.01, block_size=4096):
+    process_file(source, target, password, padding, scramble=False, progress_interval=progress_interval, block_size=block_size)
 
-
-# Menu
-choice = ""
-while choice != "3":
-    print(bcolors.YELLOW+"\n Options:")
-    print(bcolors.GREEN+"1. Encrypter")
-    print(bcolors.BLUE+"2. Decrypter")
-    print(bcolors.RED+"3. Quit")
-
-    # Capture user num. input
-    choice = getch.getch()
-    if isinstance(choice, bytes):
-        choice = choice.decode("utf-8")
-
-    if choice == "1":
-        # Define the target to encrypt [ file or folder ]
-        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
-        verify_exists(target)
-        password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
-
-        # Define the n of random bytes between original-encrypted ones
-        try:
-            global padding
-            padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
-        except:
-            print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
-            exit()
-
-        start_time = time.time()
-        tar_compression(target)
-
-        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + f' Shuffling & Inverting')
-        # Binary Shuffle | invert | fill | bits->bytes | bytes->decimal
-        target_scrambled_file = target+'.temp'
-        hash_obj = hashlib.sha256(password.encode())
-        hash_int = int.from_bytes(hash_obj.digest(), byteorder='big')
-        scramble_file(target, target_scrambled_file, password)
-        os.replace(target_scrambled_file, target)
-
+def main():
+    cls()
+    logo()
         
+    # Menu
+    choice = ""
+    while choice != "3":
+        print(bcolors.YELLOW+"\n Options:")
+        print(bcolors.GREEN+"1. Encrypter")
+        print(bcolors.BLUE+"2. Decrypter")
+        print(bcolors.RED+"3. Quit")
 
-        random_sequence = random_sequence(password)
-        gkey(random_sequence, target, target+".temp")
-        os.replace(target+".temp", target)
+        # Capture user num. input
+        choice = getch.getch()
+        if isinstance(choice, bytes):
+            choice = choice.decode("utf-8")
 
-        state = 'without' if padding == 0 else 'with'
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file {state} padding & saved as '{target}'.")
-        print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        hours, remainder = divmod(elapsed_time, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        print("\n{:.0f}h | {:.0f}m | {:.2f}s".format(hours, minutes, seconds))
+        if choice == "1":
+            # Define the target to encrypt [ file or folder ]
+            target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
+            verify_exists(target)
+            password = pwinput.pwinput(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]" +bcolors.WHITE+ " Passwd: ")
 
-        exit()
+            # Define the n of random bytes between original-encrypted ones
+            try:
+                padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
+            except:
+                print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
+                exit()
 
-                
-    if choice == "2":  # Decrypt
-        target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
-        verify_exists(target)
-        password = pwinput.pwinput(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Passwd: ")
-        try:
-            padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
-        except:
-            print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
+            start_time = time.time()
+            tar_compression(target)
+
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + f' Shuffling & Inverting')
+            # Binary Shuffle | invert | fill | bits->bytes | bytes->decimal
+            target_scrambled_file = target+'.temp'
+            hash_obj = hashlib.sha256(password.encode())
+            hash_int = int.from_bytes(hash_obj.digest(), byteorder='big')
+            scramble_file(target, target_scrambled_file, hash_int, padding)
+            os.replace(target_scrambled_file, target)
+
+            
+
+            gkey(random_sequence(password), target, target+".temp")
+            os.replace(target+".temp", target)
+
+            state = 'without' if padding == 0 else 'with'
+            print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file {state} padding & saved as '{target}'.")
+            print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            hours, remainder = divmod(elapsed_time, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            print("\n{:.0f}h | {:.0f}m | {:.2f}s".format(hours, minutes, seconds))
+
             exit()
-        start_time = time.time()
 
-        # Recover file in case of unsuccessful decryption
-        shutil.copy(target, f"{target}.backup")
+                    
+        if choice == "2":  # Decrypt
+            target = input(bcolors.WHITE + "\n[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Target name: ")
+            verify_exists(target)
+            password = pwinput.pwinput(bcolors.WHITE + "[" + bcolors.GREEN + "+" + bcolors.WHITE + "]" + bcolors.WHITE + " Passwd: ")
+            try:
+                padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
+            except:
+                print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
+                exit()
+            start_time = time.time()
 
-        random_sequence = random_sequence(password)
-        rkey(random_sequence, target, target+".temp")
-        os.replace(target+".temp", target)
-
-
-        def ajustment(data):
-            length = len(data)
-            remainder = length % 8
-            if remainder == 0:
-                decrypted_bytes = bits_to_bytes(data)
-            else:
-                decrypted_bytes = bits_to_bytes(data[:-remainder])
-            empty_file() 
-            with open(target, "wb") as f:
-                f.write(decrypted_bytes)
-
-        if padding != 0: # Remove bit padding
-            with open(target, 'rb') as f:
-                content = f.read()
-                plain = ''.join('1' if bit == '1' else '0' for byte in content for bit in format(byte, '08b'))
-                
-                print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")
-                original_data = plain
-                adjusted_data = "".join(original_data[i] for i in range(padding, len(original_data), padding + 1))
-                ajustment(adjusted_data)
+            # Recover file in case of unsuccessful decryption
+            shutil.copy(target, f"{target}.backup")
 
 
-        # Unscramble the file
-        print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Inverting & Reverting Binary Shuffle')
-        target_unscrambled_file = target+'.temp'
-        unscramble_file(target, target_unscrambled_file, password)
-        os.replace(target_unscrambled_file, target)
-        file = tar_decompression(target)
+            rkey(random_sequence(password), target, target+".temp")
+            os.replace(target+".temp", target)
 
-        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{file}'")
-        print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        hours, remainder = divmod(elapsed_time, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        print("\n{:.0f}h | {:.0f}m | {:.2f}s".format(hours, minutes, seconds))
 
-        exit()
+            def ajustment(data):
+                length = len(data)
+                remainder = length % 8
+                if remainder == 0:
+                    decrypted_bytes = bits_to_bytes(data)
+                else:
+                    decrypted_bytes = bits_to_bytes(data[:-remainder])
+                open(target, 'wb').close() 
+                with open(target, "wb") as f:
+                    f.write(decrypted_bytes)
+
+            if padding != 0: # Remove bit padding
+                with open(target, 'rb') as f:
+                    content = f.read()
+                    plain = ''.join('1' if bit == '1' else '0' for byte in content for bit in format(byte, '08b'))
+                    
+                    print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Removing random bits")
+                    original_data = plain
+                    adjusted_data = "".join(original_data[i] for i in range(padding, len(original_data), padding + 1))
+                    ajustment(adjusted_data)
+
+
+            # Unscramble the file
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Inverting & Reverting Binary Shuffle')
+            target_unscrambled_file = target+'.temp'
+            hash_obj = hashlib.sha256(password.encode())
+            hash_int = int.from_bytes(hash_obj.digest(), byteorder='big')
+            unscramble_file(target, target_unscrambled_file, hash_int, padding)
+            os.replace(target_unscrambled_file, target)
+            file = tar_decompression(target)
+
+            print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Decrypted file saved as '{file}'")
+            print(bcolors.WHITE + "[" + bcolors.GREEN + "#" + bcolors.WHITE + "]" + bcolors.WHITE + " Done ")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            hours, remainder = divmod(elapsed_time, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            print("\n{:.0f}h | {:.0f}m | {:.2f}s".format(hours, minutes, seconds))
+
+            exit()
+
+if __name__ == "__main__":
+    main()
