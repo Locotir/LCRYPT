@@ -24,7 +24,7 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
 
-### $${\color{white}[ \color{red}@ \color{white}{]} \space Binary Shuffle}$$
+### $${\color{white}[ \color{red}@ \color{white}{]} \space Binary \space Shuffle}$$
 
 ### [@] Reverse Binary Chain
 
