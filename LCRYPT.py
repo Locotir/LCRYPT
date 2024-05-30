@@ -153,11 +153,11 @@ def generate_key(random_sequence):
     return key
 
 
-def gkey(random_sequence, source, target, block_size=1024):
+def gkey(random_sequence, source, target, block_size=(500 * 1024 * 1024)*2):
     # Crear la clave en memoria
     key = generate_key(random_sequence)
 
-    buffer_size = 500 * 1024 * 1024  # 500 MB
+    buffer_size = (500 * 1024 * 1024)*2  # 1G
     buffer = BytesIO()
 
     with open(target, "ab") as encoded_file:
@@ -183,12 +183,12 @@ def gkey(random_sequence, source, target, block_size=1024):
         pool.close()
         pool.join()
 
-def rkey(random_sequence, source, target, block_size=1024):
+def rkey(random_sequence, source, target, block_size=(500 * 1024 * 1024)*2):
     # Crear la clave en memoria
     key = generate_key(random_sequence)
     inverse_key = {value: binary for binary, value in key.items()}
 
-    buffer_size = 500 * 1024 * 1024  # 500 MB
+    buffer_size = (500 * 1024 * 1024)*2  # 1G
     buffer = BytesIO()
 
     with open(target, "ab") as reconstructed_file:
@@ -258,7 +258,7 @@ def process_block(args):
 
 
 # Byte shuffle
-def process_file(source, target, password, padding, scramble=True, progress_interval=0.1, block_size=4096, num_processes=8):
+def process_file(source, target, password, padding, scramble=True, progress_interval=0.1, block_size=4096, num_processes=int(os.cpu_count())):
     total_size = os.path.getsize(source)
 
     if padding != 0 and scramble == False:
