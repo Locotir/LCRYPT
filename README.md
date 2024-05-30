@@ -50,5 +50,3 @@ This program is provided for educational and research purposes only. The user as
 
 ![2024-05-18-192505_888x609_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/92ab5415-f93b-47c2-99bb-0b71b5433283)
 
-# Donations
-https://paypal.me/locotir
