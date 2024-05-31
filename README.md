@@ -54,12 +54,12 @@ This program is provided for educational and research purposes only. The user as
 For a simpler visualization, in this case we are not using TAR as it leads to a bigger file for the small files.
 
 Target: Text file, contains 'a'
-        Content in binary: 01100001 00001010
-        Content in HEX: 610a
+        - Content in binary: 01100001 00001010
+        - Content in HEX: 610a
 
 Encrypted with padding = 1:
-        Content in binary: 01011000 00001011 00010111 01110110
-        Content in HEX: 580b 1776
+        - Content in binary: 01011000 00001011 00010111 01110110
+        - Content in HEX: 580b 1776
 
 ## Process
 - 1. Original bits: 01100001 00001010
@@ -67,13 +67,13 @@ Encrypted with padding = 1:
 - 3. Result reversed: 00111101 11011110
 - 4. Adding Padding: 00100101 11010001 01110001 11011110 : Each bit generated is also random
 - 5. Byte to decimal: 00100101 : 88   Each list is randomized with passwd+(padding value)
-                    11010001 : 11
-                    01110001 : 23
-                    11011110 : 118
+                    - - 11010001 : 11
+                    - - 01110001 : 23
+                    - - 11011110 : 118
 - 6. Decimal to byte:  88 : 01011000
-                     11 : 00001011
-                     23 : 00010111
-                    118 : 01110110
+                     - - 11 : 00001011
+                     - - 23 : 00010111
+                    - - 118 : 01110110
 - 7. Result: 01011000 00001011 00010111 01110110
 
 ## Break Attempt
