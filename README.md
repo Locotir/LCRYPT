@@ -19,8 +19,9 @@ python LCRYPT.py
 ### Targets accepted
 All type of files and folders
 
-### I take NO responsibility
-This program is provided for educational and research purposes only. The user assumes all responsibility for the use of the program. The developer is not responsible for any misuse, damage or problems caused by the program. It is strongly recommended to use this software in an ethical and legal manner. 
+### I take NO responsibility in misuse
+This program is provided for educational and research purposes only. The user assumes all responsibility for the use of the program. The developer is not responsible for any misuse, damage or problems caused by the program. It is strongly recommended to use this software in an ethical and legal manner.
+
 
 # Program Operation
 > [!NOTE]
