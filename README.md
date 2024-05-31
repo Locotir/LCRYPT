@@ -62,22 +62,19 @@ Encrypted with padding = 1:
         Content in HEX: 580b 1776
 
 ## Process
-
 1. Original bits: 01100001 00001010
 2. Byte random sequence: [2, 1, 6, 0, 3, 5, 7, 4] : Randomized with the passwd
 3. Result reversed: 00111101 11011110
 4. Adding Padding: 00100101 11010001 01110001 11011110 : Each bit generated is also random
-5. Byte to decimal:
-00100101 : 88   Each list is randomized with passwd+(padding value)
-11010001 : 11
-01110001 : 23
-11011110 : 118
-   
-7. Decimal to byte:  88 : 01011000
+5. Byte to decimal: 00100101 : 88   Each list is randomized with passwd+(padding value)
+                    &nbsp;11010001 : 11
+                    01110001 : 23
+                    11011110 : 118
+6. Decimal to byte:  88 : 01011000
                      11 : 00001011
                      23 : 00010111
                     118 : 01110110
-8. Result: 01011000 00001011 00010111 01110110
+7. Result: 01011000 00001011 00010111 01110110
 
 ## Break Attempt
 The result file is never gonna have metadata about the original file.
@@ -102,7 +99,6 @@ The last option and only possible one is by bruteforcing the decryption process 
   But using a password long enough and not listed in any dictionary, it would take for ever.
   
         
-
 
 
 
