@@ -227,22 +227,25 @@ def generate_random_sequence(password, length):
     random.seed(digest)
     return random.sample(range(length), length)
 
+
 def process_byte_padding(byte, positions, padding):
     scrambled_byte = ['0'] * 8
     for i, pos in enumerate(positions):
-        scrambled_byte[i] = ''.join(random.choices('01', k=padding)) + byte[pos]
+        scrambled_byte[i] = ''.join('1' if bit == '0' else '0' for bit in byte[pos])
+        # Add random padding
+        scrambled_byte[i] = ''.join(random.choices('01', k=padding)) + scrambled_byte[i]
     return ''.join(scrambled_byte)
 
 def process_byte(byte, positions):
     scrambled_byte = ['0'] * 8
     for i, pos in enumerate(positions):
-        scrambled_byte[i] = byte[pos]
+        scrambled_byte[i] = '1' if byte[pos] == '0' else '0'
     return ''.join(scrambled_byte)
 
 def reverse_byte(byte, positions):
     unscrambled_byte = ['0'] * 8
     for i, pos in enumerate(positions):
-        unscrambled_byte[pos] = byte[i]
+        unscrambled_byte[pos] = '1' if byte[i] == '0' else '0'
     return ''.join(unscrambled_byte)
 
 
