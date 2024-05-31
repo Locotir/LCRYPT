@@ -54,12 +54,12 @@ This program is provided for educational and research purposes only. The user as
 For a simpler visualization, in this case we are not using TAR as it leads to a bigger file for the small files.
 
 Target: Text file, contains 'a'
-        - Content in binary: 01100001 00001010
-        - Content in HEX: 610a
+- Content in binary: 01100001 00001010
+- Content in HEX: 610a
 
 Encrypted with padding = 1:
-        - Content in binary: 01011000 00001011 00010111 01110110
-        - Content in HEX: 580b 1776
+- Content in binary: 01011000 00001011 00010111 01110110
+- Content in HEX: 580b 1776
 
 ## Process
 - 1. Original bits: 01100001 00001010
