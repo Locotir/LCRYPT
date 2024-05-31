@@ -49,3 +49,58 @@ This program is provided for educational and research purposes only. The user as
 
 ![2024-05-18-192505_888x609_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/92ab5415-f93b-47c2-99bb-0b71b5433283)
 
+# Breakthrough Attempt
+## Scenario
+For a simpler visualization, in this case we are not using TAR as it leads to a bigger file for the small files.
+
+Target: Text file, contains 'a'
+        Content in binary: 01100001 00001010
+        Content in HEX: 610a
+
+Encrypted with padding = 1:
+        Content in binary: 01011000 00001011 00010111 01110110
+        Content in HEX: 580b 1776
+
+## Process
+
+1. Original bits: 01100001 00001010
+2. Byte random sequence: [2, 1, 6, 0, 3, 5, 7, 4] : Randomized with the passwd
+3. Result reversed: 00111101 11011110
+4. Adding Padding: 00100101 11010001 01110001 11011110 : Each bit generated is also random
+5. Byte to decimal: 00100101 : 88   Each list is randomized with passwd+(padding value)
+                    11010001 : 11
+                    01110001 : 23
+                    11011110 : 118
+6. Decimal to byte:  88 : 01011000
+                     11 : 00001011
+                     23 : 00010111
+                    118 : 01110110
+7. Result: 01011000 00001011 00010111 01110110
+
+## Break Attempt
+The result file is never gonna have metadata about the original file.
+Also the lack of a file type patterns also disapears adding !=0 padding.
+From here, any atempt for decrypting the file is impossible.
+
+Let's imagine, the atacker knows the encryption method and the original file size:
+  As in this case, the file is double the size, so padding is 1.
+  If he attempts to remove the padding, the result will be: 11000001 01111110
+                                        the original looks: 01100001 00001010 (not even close obviously)
+  In just 2 bytes of 8bits exists 65.536 possible combinations.
+  The correct way to decrypt the file is by having the decimal to byte reference list which is generated with passwd+(padding value)
+  
+  Only if the attacker knows exactly the start or end of a byte in the file:
+      He would need to create each unique list 1-256 of 256 lenght and then remove padding and verify if the original byte is there.
+      This sounds possible, but it really dosen't make sense as the possible unique lists is: ```857817775342842654119082271681232625157781520279485619859655650377269452553147589377440291360451408450375885342336584306157196834693696475322289288497426025679637332563368786442675207626794560187968867971521143307702077526646451464709187326100832876325702818980773671781454170250523018608495319068138257481070252817559459476987034665712738139286205234756808218860701203611083152093501947437109101726968262861606263662435022840944191408424615936000000000000000000000000000000000000000000000000000000000000000```
+      So, here also there is no way to decrypt the file.
+
+The last option and only possible one is by bruteforcing the decryption process from the program.
+  For the smallests files, the execution time is aprox 0.05s.
+  If the attacker uses a 14M passwords dictionary: ~8 days would take.
+  But using a password long enough and not listed in any dictionary, it would take for ever.
+  
+        
+
+
+
+
