@@ -99,20 +99,21 @@ def bits_to_bytes(bits):
     return bytes(int(bits[i:i+8], 2) for i in range(0, len(bits), 8))
         
 # Function to generate a random sequence based on a password
-def random_sequence(passwd):
-    # Generate first column with password dependency
-    first_column = list(range(256))
+def random_sequence(passwd,padding):
+    passwd += str(padding)
     passwd_hash = hashlib.sha256(passwd.encode()).digest()
-    random_seed = int.from_bytes(passwd_hash, 'big')
-    random.seed(random_seed)
+    random.seed(passwd_hash)
+    # Random column
+    first_column = list(range(256))
     random.shuffle(first_column)
 
-    # Generate second column fixed
+    # Second static column
     second_column = [format(i, '08b') for i in range(256)]
 
-    # Combine the two columns into a list
+    # Combine two columns into a list
     random_sequence = [f"{first_column[i]} {second_column[i]}" for i in range(256)]
     return random_sequence
+
 
 # Función para leer datos binarios de un archivo en bloques
 def read_binary_in_blocks(file_path, block_size):
@@ -370,7 +371,7 @@ def main():
 
             
 
-            gkey(random_sequence(password), target, target+".temp")
+            gkey(random_sequence(password,padding), target, target+".temp")
             os.replace(target+".temp", target)
 
             state = 'without' if padding == 0 else 'with'
@@ -400,7 +401,7 @@ def main():
             shutil.copy(target, f"{target}.backup")
 
 
-            rkey(random_sequence(password), target, target+".temp")
+            rkey(random_sequence(password,padding), target, target+".temp")
             os.replace(target+".temp", target)
 
 
