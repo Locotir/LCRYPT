@@ -24,10 +24,10 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
 > [!NOTE]
-> [@] Binary Shuffle     
-> [@] Reverse Binary Chain         
-> [@] Fill with bits between each original bit            
-> [@] Convert each 8bit string to decimal (0-255):Psswd randomized            
+> ***[@] Binary Shuffle     ***
+> ***[@] Reverse Binary Chain     ***    
+> ***[@] Fill with bits between each original bit            ***
+> ***[@] Convert each 8bit string to decimal (0-255):Psswd randomized            ***
 
 # Graphical Explanation
 
