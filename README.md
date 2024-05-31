@@ -38,7 +38,8 @@ This program is provided for educational and research purposes only. The user as
 
 ![2024-05-18-192236_696x295_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/18fc078e-3852-4f36-a096-ceb9904af482)
 
-### After compressing the target, shuffling, applying bit padding, converting bytes to decimal reference numbers, and saving in binary format.
+### After compresion, shuffling, reverse, padding and bytes to decimal number saved in binary format:
+
 
 ![2024-05-18-192525_712x292_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/f84e40bb-97ce-4809-88d7-7b84750840ee)
 
