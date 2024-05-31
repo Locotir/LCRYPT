@@ -24,7 +24,7 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
     
-### [#f03c15@] Binary Shuffle
+### [```dif - @```] Binary Shuffle
 
 ### $${\color{white}[ \color{red}@ \color{white}{]} \space Reverse \space Binary \space Chain}$$ 
 
