@@ -23,14 +23,11 @@ All type of files and folders
 This program is provided for educational and research purposes only. The user assumes all responsibility for the use of the program. The developer is not responsible for any misuse, damage or problems caused by the program. It is strongly recommended to use this software in an ethical and legal manner. 
 
 # Program Operation
-    
-### [```dif - @```] Binary Shuffle
-
-### $${\color{white}[ \color{red}@ \color{white}{]} \space Reverse \space Binary \space Chain}$$ 
-
-### $${\color{white}[ \color{red}@ \color{white}{]} \space Fill \space whith \space bits \space between \space each \space original \space bit}$$ 
-
-### $${\color{white}[ \color{red}@ \color{white}{]} \space Convert \space each \space 8bit \space string \space to \space decimal \space \color{lightgreen}(0-255):Psswd \space \color{white}randomized}$$ 
+> [!NOTE]
+> [@] Binary Shuffle     
+> [@] Reverse Binary Chain
+> [@] Fill with bits between each original bit
+> [@] Convert each 8bit string to decimal (0-255):Psswd randomized
 
 # Graphical Explanation
 
