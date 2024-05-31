@@ -23,8 +23,8 @@ All type of files and folders
 This program is provided for educational and research purposes only. The user assumes all responsibility for the use of the program. The developer is not responsible for any misuse, damage or problems caused by the program. It is strongly recommended to use this software in an ethical and legal manner. 
 
 # Program Operation
-
-### $${\color{white}[ \color{red}@ \color{white}{]} \space Binary \space Shuffle}$$
+    
+### [#f03c15@] Binary Shuffle
 
 ### $${\color{white}[ \color{red}@ \color{white}{]} \space Reverse \space Binary \space Chain}$$ 
 
