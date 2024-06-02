@@ -80,7 +80,7 @@ From here, any atempt for decrypting the file is impossible.
 Let's imagine, the atacker knows the encryption method and the original file size:
   - As in this case, the file is double the size, so padding is 1.
   - If he attempts to remove the padding, the result will be: 00100011 01110111
-  - ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤthe original looks: 01100001 00001010 (not even close obviously)
+ ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤthe original looks: 01100001 00001010 (not even close obviously)
   - In just 2 bytes of 8bits exists 65.536 possible combinations.
   - The correct way to decrypt the file is by having the decimal to byte reference list which is generated with passwd+(padding value)
   
