@@ -58,19 +58,19 @@ Target: Text file, contains 'a'
 - Content in HEX: 610a
 
 Encrypted with padding = 1:
-- Content in binary: 01011000 00001011 00010111 01110110
-- Content in HEX: 580b 1776
+- Content in binary: 11110010 01010110 11111110 10001000
+- Content in HEX: f256 fe88
 
 ## Process
 - 1. Original bits: 01100001 00001010
-- 2. Byte random sequence: [2, 1, 6, 0, 3, 5, 7, 4] : Randomized with the passwd
-- 3. Result reversed: 00111101 11011110
-- 4. Adding Padding: 00100101 11010001 01110001 11011110 : Each bit generated is also random
+- 2. Byte random sequence: [1, 2, 5, 3, 0, 6, 4, 7] & [7, 2, 6, 5, 3, 1, 4, 0] : Randomized with the passwd for each byte
+- 3. Result reversed: 00111110 11011101
+- 4. Adding Padding: 00000111 01011110 11010011 11010011 : Each bit generated is also random
 - 5. Byte to decimal (Each list is randomized with passwd+(padding value)):
-- 00100101 : 88 | 11010001 : 11 | 01110001 : 23 | 11011110 : 118
+- 00000111 : 142 | 01011110 : 167 | 11010011 : 151 | 11010011 : 151
 - 6. Decimal to byte:
-- 88 : 01011000 | 11 : 00001011 | 23 : 00010111 | 118 : 01110110
-- 7. Result: 01011000 00001011 00010111 01110110
+- 142 : 10001110 | 167: 10100111 | 151 : 10010111 | 151 : 10010111
+- 7. Result: 10001110 10100111 10010111 10010111
 
 ## Break Attempt
 The result file is never gonna have metadata about the original file.
@@ -79,8 +79,8 @@ From here, any atempt for decrypting the file is impossible.
 
 Let's imagine, the atacker knows the encryption method and the original file size:
   - As in this case, the file is double the size, so padding is 1.
-  - If he attempts to remove the padding, the result will be: 11000001 01111110
-                                        - the original looks: 01100001 00001010 (not even close obviously)
+  - If he attempts to remove the padding, the result will be: 00100011 01110111
+  - ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤthe original looks: 01100001 00001010 (not even close obviously)
   - In just 2 bytes of 8bits exists 65.536 possible combinations.
   - The correct way to decrypt the file is by having the decimal to byte reference list which is generated with passwd+(padding value)
   
