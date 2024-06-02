@@ -126,7 +126,6 @@ def read_binary_in_blocks(file_path, block_size):
 
 # Función global para procesar bloques en gkey
 def process_block_gkey(block, key):
-    block_size = 8
     result = []
     for byte in block:
         binary_byte = format(byte, '08b')
@@ -250,7 +249,7 @@ def reverse_byte(byte, positions):
 
 
 def process_block(args):
-    block_index, block, positions, scramble, padding = args
+    block, positions, scramble, padding = args
     if scramble:
         if padding != 0:
             processed_block = [process_byte_padding(format(byte, '08b'), positions, padding) for byte in block]
@@ -258,45 +257,41 @@ def process_block(args):
             processed_block = [process_byte(format(byte, '08b'), positions) for byte in block]
     else:
         processed_block = [reverse_byte(format(byte, '08b'), positions) for byte in block]
-    return block_index, ''.join(processed_block)
+    return ''.join(processed_block)
 
-
-# Byte shuffle
-def process_file(source, target, password, padding, scramble=True, progress_interval=0.1, block_size=4096, num_processes=int(os.cpu_count())):
+# Binary Shuffle
+def process_file(source, target, password, padding, scramble=True, progress_interval=0.1, block_size=1, num_processes=None):
     total_size = os.path.getsize(source)
 
-    if padding != 0 and scramble == False:
+    if padding != 0 and not scramble:
         total_size = total_size
-    elif padding != 0 and scramble == True:
+    elif padding != 0 and scramble:
         total_size = total_size * (padding + 1)
 
     interval_bytes = max(1, int(total_size * progress_interval))
     start_time = time.time()
     processed_bytes = 0
 
-    with open(source, 'rb') as src:
-        blocks = []
-        block_index = 0
-        while True:
-            block = src.read(block_size)
-            if not block:
-                break
-            positions = generate_random_sequence(str(password) + str(block_index), 8)
-            blocks.append((block_index, block, positions, scramble, padding))
-            block_index += 1
+    def block_generator():
+        with open(source, 'rb') as src:
+            loop = 0
+            while True:
+                block = src.read(block_size)
+                if not block:
+                    break
+                positions = generate_random_sequence(str(password) + str(loop), 8)
+                loop +=1
+                yield (block, positions, scramble, padding)
 
-    
-    with multiprocessing.Pool(processes=num_processes) as pool:
-        processed_blocks = pool.map(process_block, blocks)
-
-    processed_blocks.sort(key=lambda x: x[0])
+    pool = multiprocessing.Pool(processes=num_processes)
+    processed_blocks = pool.map(process_block, block_generator())
 
     buffer = deque()
     buffer_size = 0
-    max_buffer_size = 500 * 1024 * 1024  # 500MB buffer size
+    max_buffer_size = 50 * 1024 * 1024  # 50MB buffer size
 
     with open(target, 'ab') as tgt:
-        for block_index, processed_block in processed_blocks:
+        for processed_block in processed_blocks:
             buffer.append(bits_to_bytes(processed_block))
             buffer_size += len(processed_block) // 8
 
@@ -316,19 +311,20 @@ def process_file(source, target, password, padding, scramble=True, progress_inte
                 else:
                     remaining_time = 0
                 progress = int(processed_bytes / total_size * 100)
-                print(bcolors.WHITE + "[" + bcolors.RED + "~" + bcolors.WHITE + "]" + bcolors.WHITE +f" Progress: "+bcolors.VIOLET+f"{progress}"+bcolors.WHITE+f"% competed | "+bcolors.BLUEL+f"{processed_bytes}"+bcolors.WHITE+f"/"+bcolors.ORANGE+f"{total_size}"+bcolors.WHITE+f" bytes | Time left: "+bcolors.GREEN+f"{remaining_time:.2f}"+bcolors.WHITE+" sec", end="\r")
+                print(bcolors.WHITE + "[" + bcolors.RED + "~" + bcolors.WHITE + "]" + bcolors.WHITE +f" Progress: "+bcolors.VIOLET+f"{progress}"+bcolors.WHITE+f"% completed | "+bcolors.BLUEL+f"{processed_bytes}"+bcolors.WHITE+f"/"+bcolors.ORANGE+f"{total_size}"+bcolors.WHITE+f" bytes | Time left: "+bcolors.GREEN+f"{remaining_time:.2f}"+bcolors.WHITE+" sec", end="\r")
 
                 interval_bytes += max(1, int(total_size * progress_interval))
 
         while buffer:
             tgt.write(buffer.popleft())
 
+
 # Function to scramble a file
-def scramble_file(source, target, password, padding, progress_interval=0.01, block_size=4096):
+def scramble_file(source, target, password, padding, progress_interval=0.01, block_size=1):
     process_file(source, target, password, padding, scramble=True, progress_interval=progress_interval, block_size=block_size)
 
 # Function to unscramble a file
-def unscramble_file(source, target, password, padding, progress_interval=0.01, block_size=4096):
+def unscramble_file(source, target, password, padding, progress_interval=0.01, block_size=1):
     process_file(source, target, password, padding, scramble=False, progress_interval=progress_interval, block_size=block_size)
 
 def main():
@@ -371,8 +367,6 @@ def main():
             hash_int = int.from_bytes(hash_obj.digest(), byteorder='big')
             scramble_file(target, target_scrambled_file, hash_int, padding)
             os.replace(target_scrambled_file, target)
-
-            
 
             gkey(random_sequence(password,padding), target, target+".temp")
             os.replace(target+".temp", target)
