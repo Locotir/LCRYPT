@@ -4,6 +4,7 @@ import hashlib
 import sys
 import os
 import random
+import secrets
 import time
 import shutil
 import tarfile
@@ -99,19 +100,24 @@ def bits_to_bytes(bits):
     return bytes(int(bits[i:i+8], 2) for i in range(0, len(bits), 8))
         
 # Function to generate a random sequence based on a password
-def random_sequence(passwd,padding):
+def random_sequence(passwd, padding):
     passwd += str(padding)
     passwd_hash = hashlib.sha256(passwd.encode()).digest()
+
+    # Initialize the random generator with a hash-based seed
     random.seed(passwd_hash)
+
     # Random column
     first_column = list(range(256))
     random.shuffle(first_column)
 
     # Second static column
     second_column = [format(i, '08b') for i in range(256)]
+    random.shuffle(second_column)
 
     # Combine two columns into a list
     random_sequence = [f"{first_column[i]} {second_column[i]}" for i in range(256)]
+    print(random_sequence)
     return random_sequence
 
 
@@ -354,7 +360,7 @@ def main():
             try:
                 padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
             except:
-                print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
+                print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
                 exit()
 
             start_time = time.time()
@@ -390,7 +396,7 @@ def main():
             try:
                 padding = int(input(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Fill *bit value (0-∞): "))
             except:
-                print(bcolors.WHITE + "[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
+                print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + " The fill value must be a positive integer.")
                 exit()
             start_time = time.time()
 
