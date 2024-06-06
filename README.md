@@ -37,17 +37,18 @@ This program is provided for educational and research purposes only. The user as
 
 # Target
 
-![2024-05-18-192236_696x295_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/18fc078e-3852-4f36-a096-ceb9904af482)
+![2024-06-06-200547_702x294_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/79ed003a-82a9-4565-832e-0f6e29695ff8)
+
 
 ### After compresion, shuffling, reverse, padding and bytes to decimal number saved in binary format:
 
 
-![2024-05-18-192525_712x292_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/f84e40bb-97ce-4809-88d7-7b84750840ee)
+![2024-06-06-200703_710x304_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/a67c8673-8df6-4c86-ac63-3d1e54f4f47b)
 
 
 # Console Preview
 
-![2024-05-18-192505_888x609_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/92ab5415-f93b-47c2-99bb-0b71b5433283)
+![2024-06-06-200619_954x608_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/f71bee13-13fb-40a9-983b-f794fd4295cb)
 
 # Breakthrough Attempt
 ## Scenario
@@ -58,8 +59,8 @@ Target: Text file, contains 'a'
 - Content in HEX: 610a
 
 Encrypted with padding = 1:
-- Content in binary: 11110010 01010110 11111110 10001000
-- Content in HEX: f256 fe88
+- Content in binary: 10011110 11111100 00110010 10111101
+- Content in HEX: 9efc 32bd
 
 ## Process
 - 1. Original bits: 01100001 00001010
@@ -71,21 +72,23 @@ Encrypted with padding = 1:
 - 6. Decimal to byte:
 - 142 : 10001110 | 167: 10100111 | 151 : 10010111 | 151 : 10010111
 - 7. Result: 10001110 10100111 10010111 10010111
+- 8. XOR Key: 01101100 10101010 11001100 00110101
+- 9. Final Result: 10011110 11111100 00110010 10111101
 
 ## Break Attempt
 The result file is never gonna have metadata about the original file.
-Also the lack of a file type patterns also disapears adding !=0 padding.
+Also the lack of a file type patterns also disapears with XOR Key.
 From here, any atempt for decrypting the file is impossible.
 
 Let's imagine, the atacker knows the encryption method and the original file size:
   - As in this case, the file is double the size, so padding is 1.
-  - If he attempts to remove the padding, the result will be: 00100011 01110111
+  - If he attempts to remove the padding, the result will be: 01101110 01000111
   - ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤthe original looks: 01100001 00001010 (not even close obviously)
   - In just 2 bytes of 8bits exists 65.536 possible combinations.
   - The correct way to decrypt the file is by having the decimal to byte reference list which is generated with passwd+(padding value)
   
   - Only if the attacker knows exactly the start or end of a byte in the file:
-      He would need to create each unique list 1-256 of 256 lenght and then remove padding and verify if the original byte is there.
+      He would need to create the original XOR Key which is the same lenght as the file, and after replicate each unique list 1-256 of 256 lenght and then remove padding and verify if the original byte is there.
       This sounds possible, but it really dosen't make sense as the possible unique lists is: ```857817775342842654119082271681232625157781520279485619859655650377269452553147589377440291360451408450375885342336584306157196834693696475322289288497426025679637332563368786442675207626794560187968867971521143307702077526646451464709187326100832876325702818980773671781454170250523018608495319068138257481070252817559459476987034665712738139286205234756808218860701203611083152093501947437109101726968262861606263662435022840944191408424615936000000000000000000000000000000000000000000000000000000000000000```
       So, here also there is no way to decrypt the file.
 
