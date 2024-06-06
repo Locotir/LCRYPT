@@ -229,6 +229,40 @@ def rkey(random_sequence, source, target, block_size=(500 * 1024 * 1024)*2):
         pool.close()
         pool.join()
 
+def generate_hash_key(passwd, key_length):
+    sha256 = hashlib.sha256()
+    sha256.update(passwd.encode('utf-8'))
+    current_hash = sha256.digest()
+    
+    large_number_str = current_hash
+    while len(large_number_str) < key_length:
+        sha256 = hashlib.sha256()
+        sha256.update(large_number_str)
+        current_hash = sha256.digest()
+        large_number_str += current_hash
+    
+    return large_number_str[:key_length]
+
+def xor_crypt_file(input_file, output_file, password, mode='encrypt'):
+
+    file_size = os.path.getsize(input_file)
+    # Key from passwd hash
+    key = generate_hash_key(password, file_size)
+
+
+    with open(input_file, 'rb') as f_in, open(output_file, 'wb') as f_out:
+        key_index = 0
+        while chunk := f_in.read(1):
+            byte = chunk[0]
+            key_byte = key[key_index]
+            if mode == 'encrypt':
+                result_byte = byte ^ key_byte
+            elif mode == 'decrypt':
+                result_byte = byte ^ key_byte
+
+            f_out.write(bytes([result_byte]))
+            key_index += 1
+
 
 # Function to invert bits (1 to 0 and 0 to 1)
 def invert_bits(bit_string):
@@ -392,6 +426,11 @@ def main():
 
             gkey(random_sequence(password,padding), target, target+".temp")
             os.replace(target+".temp", target)
+            
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Applying XOR key")
+            target_xor = target+'.temp'
+            xor_crypt_file(target, target_xor, password, mode='encrypt')
+            os.replace(target_xor, target)
 
             state = 'without' if padding == 0 else 'with'
             print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]" +bcolors.WHITE+ f" Encrypted file {state} padding & saved as '{target}'.")
@@ -419,6 +458,10 @@ def main():
             # Recover file in case of unsuccessful decryption
             shutil.copy(target, f"{target}.backup")
 
+            print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + " Reversing XOR key")
+            target_xor = target+'.temp'
+            xor_crypt_file(target, target_xor, password, mode='decrypt')
+            os.replace(target_xor, target)
 
             rkey(random_sequence(password,padding), target, target+".temp")
             os.replace(target+".temp", target)
