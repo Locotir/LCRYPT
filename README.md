@@ -33,7 +33,7 @@ This program is provided for educational and research purposes only. The user as
 
 # Graphical Explanation
 
-![explained drawio](https://github.com/Locotir/LCRYPT/assets/71979632/b56b1ee2-3f0e-4c14-a89e-ae81dd23c300)
+![explained drawio (1)](https://github.com/Locotir/LCRYPT/assets/71979632/addd9770-aeef-4d20-956e-31665ffb31f8)
 
 
 # Target
