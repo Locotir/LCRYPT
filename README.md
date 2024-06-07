@@ -28,7 +28,7 @@ This program is provided for educational and research purposes only. The user as
 > [@] Binary Shuffle     
 > [@] Reverse Binary Chain         
 > [@] Fill with bits between each original bit            
-> [@] Convert each 8bit string to decimal (0-255):Psswd randomized
+> [@] Convert each 8bit string to decimal (0-255):Psswd randomized           
 > [@] XOR Key applied as long as entire file bit string            
 
 # Graphical Explanation
