@@ -40,6 +40,7 @@ def logo():
 
 sys.path.append(os.path.realpath("."))
 
+
 def exit():
     sys.exit("\nExiting...")
 
@@ -263,7 +264,6 @@ def xor_crypt_file(input_file, output_file, password, mode='encrypt'):
             f_out.write(bytes([result_byte]))
             key_index += 1
 
-
 # Function to invert bits (1 to 0 and 0 to 1)
 def invert_bits(bit_string):
     return ''.join('1' if char == '0' else '0' for char in bit_string)
@@ -389,11 +389,12 @@ def main():
         
     # Menu
     choice = ""
-    while choice != "3":
+    while choice != "4":
         print(bcolors.YELLOW+"\n Options:")
         print(bcolors.GREEN+"1. Encrypter")
         print(bcolors.BLUE+"2. Decrypter")
-        print(bcolors.RED+"3. Quit")
+        print(bcolors.PURPLE+"3. Passwd generator")
+        print(bcolors.RED+"4. Quit")
 
         # Capture user num. input
         choice = getch.getch()
@@ -508,5 +509,60 @@ def main():
 
             exit()
 
+
+        if choice == "3":
+            
+            passwd = input(bcolors.WHITE+"\n[" + bcolors.GREEN+"+" + bcolors.WHITE+"] Passwd lenght 0-∞: ")
+            print(bcolors.GREEN+"\n     1."+bcolors.WHITE+"Only lowe case\n"+bcolors.GREEN+"     2."+bcolors.WHITE+"Only letters\n"+bcolors.GREEN+"     3."+bcolors.WHITE+"Letters & numbers\n"+bcolors.GREEN+"     4."+bcolors.WHITE+ "All\n")
+            choice = getch.getch()
+            choice = int(choice)
+
+            if choice == 1:
+                characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','ñ','o','p','q','r','s','t','u','v','w','x','y','z']
+            if choice == 2:
+                characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','ñ','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+            elif choice == 3:
+                characters = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m','n','ñ','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+            elif choice == 4:
+                characters = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k','l','m','n','ñ','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','!','"','#','$','%','&','(',')',',','*','+',',','-','.','/',':',';','<','=','>','?','@','[',']','^','_','`','{','|','}','~']
+
+            tested = ['']
+            
+            cls()
+            limit = input(bcolors.WHITE+"[" + bcolors.GREEN+"+" + bcolors.WHITE+"]  passwd's to generate: ")
+
+            global counter
+            counter=0
+            seed = input(bcolors.WHITE+"[" + bcolors.RED+"!" + bcolors.WHITE+"] Enter the seed for ranom function (as long as possible): ")
+            cls()
+
+            random.seed(seed)
+            def crack(passwd,characters):
+                large = passwd
+                def passwd_():
+                    passwd = ''
+
+                    number = random.randint(0,len(characters)-1)
+                    letter = characters[number]
+                    while len(passwd) < int(large):
+                        number = random.randint(0,len(characters)-1)
+                        letter = characters[number]
+                        passwd += str(letter)
+                    global counter
+                    if counter < (int(limit)):
+                        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]",str(counter)+"." ,passwd +"\n")
+                        formato = (passwd)
+                        tested.append(formato)
+                        counter += 1
+                    else:
+                        print(bcolors.WHITE+"[" + bcolors.GREEN+"=" + bcolors.WHITE+"]",str(counter)+"." ,passwd +"\n")
+                
+                while int(counter) != int(limit):
+                    passwd_()
+ 
+            crack(passwd,characters)
+            print(bcolors.WHITE+"[" + bcolors.RED+"+" + bcolors.WHITE+"]. Succesfully created "+limit+" passwd combinations:")
+            exit()
+            
 if __name__ == "__main__":
     main()
