@@ -4,7 +4,6 @@ import hashlib
 import sys
 import os
 import random
-import secrets
 import time
 import shutil
 import tarfile
@@ -58,14 +57,13 @@ def read_binary(file):
     return binary_content
 
 
-
 def tar_compression(file):
     print(bcolors.WHITE + "[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Compressing')
     try:
-        # make tar file
+        # Crear archivo tar
         with tarfile.open(f"{file}.tar.gz", "w:gz") as tar:
-            tar.add(file, arcname=os.path.basename(file))
-        # Delete original file
+            tar.add(file, arcname=os.path.basename(file), filter=lambda x: x)  # Filtro que no modifica nada
+        # Eliminar archivo original
         if os.path.isdir(file):
             shutil.rmtree(file)
         elif os.path.isfile(file):
@@ -79,12 +77,17 @@ def tar_decompression(file):
     print(bcolors.WHITE + "\n[" + bcolors.RED + "@" + bcolors.WHITE + "]" + bcolors.WHITE + ' Decompressing')
     try:
         shutil.move(f"{file}", f"{file}.tar.gz")
-        # extract tar.gz file
+        
+        # Define a filter function that fully trusts the archive
+        def fully_trusted_filter(tarinfo, dest_path):
+            return tarinfo  # Return the original TarInfo object without modifications
+
+        # Extract tar.gz file with 'fully_trusted' filter
         with tarfile.open(f"{file}.tar.gz", "r:gz") as tar:
-            tar.extractall(path=os.path.dirname(file))
+            tar.extractall(path=os.path.dirname(file), filter=fully_trusted_filter)
             extracted_files = tar.getnames()
 
-        # Obtain extracted file name
+        # Obtener el nombre del archivo extraído
         if extracted_files:
             last_extracted_file = extracted_files[-1]
             final_output_name = os.path.basename(last_extracted_file)
@@ -92,7 +95,7 @@ def tar_decompression(file):
         os.remove(f'{file}.backup')
         return final_output_name
     except Exception as e:
-        print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" Incorrect passwd or padding | Backup file saved as {file}.backup")
+        print(bcolors.WHITE + "\n[" + bcolors.RED + "!" + bcolors.WHITE + "]" + bcolors.WHITE + f" Error: {e} | Backup file saved as {file}.backup")
         os.remove(f"{file}.tar.gz")
         exit()
 
