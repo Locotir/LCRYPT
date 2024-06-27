@@ -238,34 +238,36 @@ def generate_hash_key(passwd, key_length):
     sha256.update(passwd.encode('utf-8'))
     current_hash = sha256.digest()
     
-    large_number_str = current_hash
+    large_number_str = bytearray()  # Using bytearray for mutable byte array
     while len(large_number_str) < key_length:
         sha256 = hashlib.sha256()
-        sha256.update(large_number_str)
+        sha256.update(current_hash)
         current_hash = sha256.digest()
-        large_number_str += current_hash
-    
-    return large_number_str[:key_length]
+        large_number_str.extend(current_hash)  # Extend bytearray with new hash
+
+    return bytes(large_number_str[:key_length])  # Convert back to bytes
 
 def xor_crypt_file(input_file, output_file, password, mode='encrypt'):
+    buffer_size = 64 * 1024  # 64 KB buffer size for reading/writing
 
     file_size = os.path.getsize(input_file)
-    # Key from passwd hash
     key = generate_hash_key(password, file_size)
-
 
     with open(input_file, 'rb') as f_in, open(output_file, 'wb') as f_out:
         key_index = 0
-        while chunk := f_in.read(1):
-            byte = chunk[0]
-            key_byte = key[key_index]
-            if mode == 'encrypt':
-                result_byte = byte ^ key_byte
-            elif mode == 'decrypt':
-                result_byte = byte ^ key_byte
-
-            f_out.write(bytes([result_byte]))
-            key_index += 1
+        while True:
+            chunk = f_in.read(buffer_size)
+            if not chunk:
+                break
+            for byte in chunk:
+                print("BYTE_",byte)
+                key_byte = key[key_index]
+                print("KEYB",key_byte)
+                if mode == 'encrypt' or mode == 'decrypt':
+                    result_byte = byte ^ key_byte
+                    print("BYTER", result_byte)
+                f_out.write(bytes([result_byte]))
+                key_index = (key_index + 1) % len(key)
 
 # Function to invert bits (1 to 0 and 0 to 1)
 def invert_bits(bit_string):
