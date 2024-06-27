@@ -260,12 +260,9 @@ def xor_crypt_file(input_file, output_file, password, mode='encrypt'):
             if not chunk:
                 break
             for byte in chunk:
-                print("BYTE_",byte)
                 key_byte = key[key_index]
-                print("KEYB",key_byte)
                 if mode == 'encrypt' or mode == 'decrypt':
                     result_byte = byte ^ key_byte
-                    print("BYTER", result_byte)
                 f_out.write(bytes([result_byte]))
                 key_index = (key_index + 1) % len(key)
 
