@@ -52,7 +52,7 @@ This program is provided for educational and research purposes only. The user as
 ![2024-06-06-200547_702x294_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/79ed003a-82a9-4565-832e-0f6e29695ff8)
 
 
-### After compresion, shuffling, reverse, padding and bytes to decimal number saved in binary format:
+### After compresion, shuffling, reverse, padding, bytes to decimal number saved in binary format and XOR Key finally applied:
 
 
 ![2024-06-06-200703_710x304_scrot](https://github.com/Locotir/LCRYPT/assets/71979632/a67c8673-8df6-4c86-ac63-3d1e54f4f47b)
