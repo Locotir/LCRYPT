@@ -5,7 +5,9 @@
 In the digital age, securing data at its core is crucial. LCRYPT offers a revolutionary encryption solution that protects data at the binary level, ensuring integrity and confidentiality. Unauthorized access is impossible without the decryption keys.
 
 ### Description
-LCRYPT encrypts files at the binary level, making data indecipherable without the correct keys. This method provides top-tier security, rendering manual decryption futile without the appropriate keys. LCRYPT-encrypted files resist reverse engineering due to their complexity. Each byte is shuffled randomly with a dynamic password and corresponds to a value between 0 and 255, complicating decryption attempts without the original tool. Even with the LCRYPT tool, brute force decryption is impractical due to the vast number of possible combinations and the required computational resources. The encryption's complexity remains a significant barrier, even against advancements in quantum computing.
+LCRYPT encrypts files at the binary level, making data indecipherable without the correct keys. This method provides top-tier security, rendering manual decryption futile without the appropriate keys. LCRYPT-encrypted files resist reverse engineering due to their complexity. Each byte is shuffled randomly with a dynamic password and corresponds to a value between 0 and 255, shuffled, and also if the user decides so, it can add a random padding for each original bit, lenght defined by user. Finally an XOR Key string matching the same lenght of the total bits of the result is applied, all this steps results on complicating decryption attempts without the original tool. Even with the LCRYPT tool, brute force decryption is impractical due to the vast number of possible combinations and the required computational resources. The encryption's complexity remains a significant barrier, even against advancements in quantum computing.
+
+**Disclaimer**: This tool does not leave any identifiable signature or trace that could be linked back to the tool or its author. The resulting encryption cannot be analyzed or reverse-engineered to understand the algorithm's nature without access to the program's source code.
 
 
 ### Installation & Run
@@ -36,11 +38,11 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
 > [!NOTE]
-> [@] Binary Shuffle     
-> [@] Reverse Binary Chain         
-> [@] Fill with bits between each original bit            
-> [@] Convert each 8bit string to decimal (0-255):Psswd randomized           
-> [@] XOR Key applied as long as entire file bit string            
+> **[@]** Binary Shuffle     
+> **[@]** Reverse Binary Chain         
+> **[@]** Fill with bits between each original bit            
+> **[@]** Convert each 8bit string to decimal (0-255):Psswd randomized           
+> **[@]** XOR Key applied as long as entire file bit string            
 
 # Graphical Explanation
 
@@ -83,9 +85,9 @@ Encrypted with padding = 1:
 - 00000111 : 142 | 01011110 : 167 | 11010011 : 151 | 11010011 : 151
 - 6. Decimal to byte:
 - 142 : 10001110 | 167: 10100111 | 151 : 10010111 | 151 : 10010111
-- 7. Result: 10001110 10100111 10010111 10010111
-- 8. XOR Key: 01101100 10101010 11001100 00110101
-- 9. Final Result: 10011110 11111100 00110010 10111101
+- 7. **Result:**       10001110 10100111 10010111 10010111
+- 8. **XOR Key:**      00010000 01011011 10100101 00101010
+- 9. **Final Result:** 10011110 11111100 00110010 10111101
 
 ## Break Attempt
 The result file is never gonna have metadata about the original file.
