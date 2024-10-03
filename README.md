@@ -39,7 +39,7 @@ This program is provided for educational and research purposes only. The user as
 # Program Operation
 > [!NOTE]
 > **[@]** Binary Shuffle     
-> **[@]** Reverse Binary Chain         
+> **[@]** Reverse each Byte Chain         
 > **[@]** Fill with bits between each original bit            
 > **[@]** Convert each 8bit string to decimal (0-255):Psswd randomized           
 > **[@]** XOR Key applied as long as entire file bit string            
@@ -91,7 +91,7 @@ Encrypted with padding = 1:
 
 ## Break Attempt
 The result file is never gonna have metadata about the original file.
-Also the lack of a file type patterns also disapears with XOR Key.
+Also the lack of a file type patterns vanishes with XOR Key.
 From here, any atempt for decrypting the file is impossible.
 
 Let's imagine, the atacker knows the encryption method and the original file size:
