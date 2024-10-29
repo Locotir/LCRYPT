@@ -2,6 +2,8 @@
 
 # LCRYPT: Unbreakable Binary-Level Encryption
 
+**Remake of this project on [LCRYPT](https://github.com/Locotir/C-LCRYPT) on C++ | Gained +99.68% performance | All I/O operations runs on RAM now**
+
 In the digital age, securing data at its core is crucial. LCRYPT offers a revolutionary encryption solution that protects data at the binary level, ensuring integrity and confidentiality. Unauthorized access is impossible without the decryption keys.
 
 ### Description
@@ -22,12 +24,12 @@ python LCRYPT.py
 All type of files and folders (The lighter, the better):                                                                                                                                          
 · **Text Files** -> .txt .docx .pdf...                                                                                                                                          
 · **Data Files** -> .xls .xlsx .csv...                                                                                                                                          
-. **Small Databases** -> .sql .db .mdb...                                                                                                                                          
+. **Small Databases** -> .sql .db .mdb...                                                                                                                                         
 · **Image Files** -> .png .jpg .gif...                                                                                                                                          
 · **Audio Files** -> .mp3 .wav...                                                                                                                                          
 · **Video Files** -> .mp4 .mkv .avi...                                                                                                                                          
-· **Presentation Files** -> .ppt .pptx...                                                                                                                                          
-· **Programming Files** -> .py .c .cpp...                                                                                                                                          
+· **Presentation Files** -> .ppt .pptx...                                                                                                                                         
+· **Programming Files** -> .py .c .cpp...                                                                                                                                         
 · **Config Files** -> .cfg .ini...                                                                                                                                          
 · **Key Files** -> .key .cer                                                                                                                                          
 · **Compressed Files** -> .zip .rar...                                                                                                                                          
@@ -38,15 +40,15 @@ This program is provided for educational and research purposes only. The user as
 
 # Program Operation
 > [!NOTE]
-> **[@]** Binary Shuffle     
-> **[@]** Reverse each Byte Chain         
-> **[@]** Fill with bits between each original bit            
-> **[@]** Convert each 8bit string to decimal (0-255):Psswd randomized           
-> **[@]** XOR Key applied as long as entire file bit string            
+> **[@]** Shuffle each Byte     
+> **[@]** Reverse Binary Chain         
+> **[@]** Fill with n bits between each original bit            
+> **[@]** Substitute each byte with decimal Table (0-255):Psswd randomized           
+> **[@]** XOR Key unique string applied as long as entire file bit string          
 
 # Graphical Explanation
 
-![explained drawio (1)](https://github.com/Locotir/LCRYPT/assets/71979632/addd9770-aeef-4d20-956e-31665ffb31f8)
+![LCRYPT-Diagrama drawio](https://github.com/user-attachments/assets/e8963029-2bea-4dca-b323-ccb53c3c297a)
 
 
 # Target
